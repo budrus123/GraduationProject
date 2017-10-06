@@ -25,7 +25,7 @@ public class TryingChoco1 {
     /**
      * @param args the command line arguments
      */
-    
+
     //model for the problem
     static Model model = new Model("my first problem");
     
@@ -102,7 +102,7 @@ public class TryingChoco1 {
         //connecting to the database
         String url = "jdbc:mysql://localhost:3306/exams";
         String username = "root";
-        String password = "";
+        String password = ""; // Sehweil password
 
         System.out.println("Connecting database...");
 
