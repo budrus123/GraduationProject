@@ -26,17 +26,24 @@ public class TryingChoco1 {
     /**
      * @param args the command line arguments
      */
+    
+    //model for the problem
     static Model model = new Model("my first problem");
+    
+    //arraylists for the courses, variabls (same as courses) and the students
     static ArrayList<Course> courseAL = new ArrayList<Course>();
     static ArrayList<IntVar> vars = new ArrayList<IntVar>();
     static ArrayList<Student> students = new ArrayList<Student>();
+    
+    //our connection
     static Connection connection;
 
     public static void main(String[] args) throws SQLException {
         // TODO code application logic here
-        // 1. Create a Model 
+       
 
         //creating students to test
+        /* no need fo this
         Student s1 = new Student(1, "d");
         Student s2 = new Student(2, "d");
         Student s3 = new Student(3, "d");
@@ -87,12 +94,13 @@ public class TryingChoco1 {
                 }
             }
         }
+        
+        */
 
-        //3. Post constraints 
-        //model.allDifferent(phys141,math141,comp141).post();
-        //model.allDifferent(phys141, math141).post();
-        // 4. Solve the problem 
-        //model.getSolver().solve();
+      
+        
+        
+        //connecting to the database
         String url = "jdbc:mysql://localhost:3306/exams";
         String username = "root";
         String password = "root";
@@ -103,21 +111,33 @@ public class TryingChoco1 {
             connection = DriverManager.getConnection(url, username, password);
             System.out.println("Database connected!");
 
+            
+            /* this is to fill both
+            the course and variables 
+            arraylists from the course
+            table from the database
+            */
             Statement stmt = connection.createStatement();
             ResultSet getCourses = stmt.executeQuery("SELECT * FROM course_table");
             while (getCourses.next()) {
-                //String s = rs.getString("id")+" "+rs.getString("COURSE_LABEL");
+               
 //                IntVar temp = model.intVar(getCourses.getString("COURSE_LABEL"), new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 //                    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45}); // phys141 in 1 2 3  
                 
-                IntVar temp = model.intVar(getCourses.getString("COURSE_LABEL"), new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30}); // phys141 in 1 2 3  
+                IntVar temp = model.intVar(getCourses.getString("COURSE_LABEL"), new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45}); // phys141 in 1 2 3  
                 vars.add(temp);
                 Course co = new Course(Integer.valueOf(getCourses.getString("id")), getCourses.getString("COURSE_LABEL"), getCourses.getString("COURSE TITLE"), getCourses.getString("DEPT"));
                 courseAL.add(co);
 
-                //System.out.println(courseAL.get(0).getLabel());
+               
             }
-
+            // end filling up the course arraylist and vars as well
+            
+            
+            
+            /*
+            this is to fill the student arraylist (all the students)
+            */
             Statement stmt2 = connection.createStatement();
             ResultSet getStudents = stmt.executeQuery("SELECT * FROM student_table");
             while (getStudents.next()) {
@@ -131,10 +151,29 @@ public class TryingChoco1 {
             Logger.getLogger(TryingChoco1.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+        
+        
+        /*
+        first function is to fill the student array list 
+        in each course so we know who takes each course
+        course A now has an arraylist of students who take it
+        */
         fillStudentTakesCourse();
+        
+        
+        /*
+        this is to create the hard constraints
+        by checking if 2 courses have the same students
+        we tell the MODEL that their values can't be the same
+        */
         fillHardConst();
         
         
+        /*
+        if the model finds a solutin, print it
+        else
+        print can't find a solution
+        */
         if(model.getSolver().solve()){
             for(int i=0;i<vars.size();i++){
             System.out.println("i equals "+i+" "+vars.get(i));
@@ -145,20 +184,7 @@ public class TryingChoco1 {
             System.out.println("no solution");
         }
         
-      
-        //System.out.println("##");
 
-//        Solver solver = model.getSolver();
-//        // 5. Print the solution 
-//        //model.getS
-//        while (solver.solve()) {
-//            // do something, e.g. print out variable values
-//            System.out.println(phys141); // Prints X = 2 
-//            System.out.println(math141); // Prints Y = 2
-//            System.out.println(comp141); // Prints Y = 2
-//            System.out.println(java); // Prints Y = 2
-//            System.out.println("##");
-//        }
     }
 
     //################################################################################################################

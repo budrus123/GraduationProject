@@ -3,6 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package tryingchoco1;
 
 import java.util.ArrayList;
@@ -25,6 +26,8 @@ public class Course {
     
     private String label,title,dept;
     private int id;
+    
+    //each course has an arraylist of students of the students that take this course
     private ArrayList al = new ArrayList<Student>();;
     
     
