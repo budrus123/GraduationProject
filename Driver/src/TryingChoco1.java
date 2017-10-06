@@ -103,6 +103,7 @@ public class TryingChoco1 {
         String url = "jdbc:mysql://localhost:3306/exams";
         String username = "root";
         String password = ""; // Sehweil password
+        //se7weil i love you <3
 
         System.out.println("Connecting database...");
 
