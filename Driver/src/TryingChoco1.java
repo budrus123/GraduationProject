@@ -12,12 +12,12 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.variables.IntVar;
 
 /**
- *
  * @author Mahmoud
  */
 public class TryingChoco1 {
@@ -28,18 +28,18 @@ public class TryingChoco1 {
 
     //model for the problem
     static Model model = new Model("my first problem");
-    
+
     //arraylists for the courses, variabls (same as courses) and the students
     static ArrayList<Course> courseAL = new ArrayList<Course>();
     static ArrayList<IntVar> vars = new ArrayList<IntVar>();
     static ArrayList<Student> students = new ArrayList<Student>();
-    
+
     //our connection
     static Connection connection;
 
     public static void main(String[] args) throws SQLException {
         // TODO code application logic here
-       
+
 
         //creating students to test
         /* no need fo this
@@ -96,9 +96,10 @@ public class TryingChoco1 {
         
         */
 
-      
-        
-        
+
+        long startTime = System.currentTimeMillis();
+
+
         //connecting to the database
         String url = "jdbc:mysql://localhost:3306/exams";
         String username = "root";
@@ -111,7 +112,6 @@ public class TryingChoco1 {
             connection = DriverManager.getConnection(url, username, password);
             System.out.println("Database connected!");
 
-            
             /* this is to fill both
             the course and variables 
             arraylists from the course
@@ -120,16 +120,16 @@ public class TryingChoco1 {
             Statement stmt = connection.createStatement();
             ResultSet getCourses = stmt.executeQuery("SELECT * FROM course_table");
             while (getCourses.next()) {
-               
+
 //                IntVar temp = model.intVar(getCourses.getString("COURSE_LABEL"), new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 //                    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45}); // phys141 in 1 2 3  
-                
-                IntVar temp = model.intVar(getCourses.getString("COURSE_LABEL"), new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45}); // phys141 in 1 2 3  
+
+                IntVar temp = model.intVar(getCourses.getString("COURSE_LABEL"),1,200); // phys141 in 1 2 3
                 vars.add(temp);
                 Course co = new Course(Integer.valueOf(getCourses.getString("id")), getCourses.getString("COURSE_LABEL"), getCourses.getString("COURSE TITLE"), getCourses.getString("DEPT"));
                 courseAL.add(co);
 
-               
+
             }
             // end filling up the course arraylist and vars as well
             
@@ -139,7 +139,7 @@ public class TryingChoco1 {
             this is to fill the student arraylist (all the students)
             */
             Statement stmt2 = connection.createStatement();
-            ResultSet getStudents = stmt.executeQuery("SELECT * FROM student_table");
+            ResultSet getStudents = stmt2.executeQuery("SELECT * FROM student_table");
             while (getStudents.next()) {
                 //String s = rs.getString("id")+" "+rs.getString("COURSE_LABEL");
                 Student s = new Student(Integer.valueOf(getStudents.getString("id")), getStudents.getString("DEPARTMENT"));
@@ -167,25 +167,76 @@ public class TryingChoco1 {
         we tell the MODEL that their values can't be the same
         */
         fillHardConst();
-        
+
+        /*
+        this is to make sure that any student doesn't have more than 1 exam
+        in the same day, by looking at the courses any student takes and
+        making all their values different
+         */
+        oneMaxForEachStudent();
         
         /*
         if the model finds a solutin, print it
         else
         print can't find a solution
         */
-        if(model.getSolver().solve()){
-            for(int i=0;i<vars.size();i++){
-            System.out.println("i equals "+i+" "+vars.get(i));
+        if (model.getSolver().solve()) {
+            for (int i = 0; i < vars.size(); i++) {
+                System.out.println("course id is "+i+"course timeslot is "+vars.get(i).getValue());
+            }
         }
-        }
-        
-        else{
+//        else if(model.getSolver().){
+//            System.out.println("reached a limit");
+//        }
+        else {
             System.out.println("no solution");
         }
-        
+
+
+        long stopTime = System.currentTimeMillis();
+        long elapsedTime = stopTime - startTime;
+        System.out.println(elapsedTime / 1000.0);
 
     }
+
+    //################################################################################################################
+    //################################################################################################################
+    //################################################################################################################
+    //################################################################################################################
+    //################################################################################################################
+
+    public static void oneMaxForEachStudent() throws SQLException {
+
+        for (int i = 0; i < students.size(); i++) {
+            Statement stmt = connection.createStatement();
+            ResultSet getStudentCourses = stmt.executeQuery("SELECT * FROM student_course_table where STUDENT_NUMBER='"+(i+1)+"'");
+            Statement stmt2 = connection.createStatement();
+            ResultSet getStudentCoursesCount = stmt2.executeQuery("SELECT count(*) FROM student_course_table where STUDENT_NUMBER='" +(i+1)+"'");
+
+            getStudentCoursesCount.next();
+            int count=Integer.valueOf(getStudentCoursesCount.getString(1));
+            //System.out.println(getStudentCoursesCount.getString(1));
+            int q=0;
+            if(count>1){
+                IntVar [] studentCourses=new IntVar[count];
+
+                while(getStudentCourses.next()){
+                    studentCourses[q++]=vars.get(Integer.valueOf(getStudentCourses.getString(2))-1);
+                }
+
+                for(int m=0;m<count;m++){
+                    for(int n=m;n<count;n++){
+                        model.arithm(studentCourses[m], "-",studentCourses[n] , ">", 2).post();
+
+                    }
+                }
+                //model.allDifferent(studentCourses);
+            }
+
+
+        }
+    }
+
 
     //################################################################################################################
     //################################################################################################################
@@ -197,6 +248,8 @@ public class TryingChoco1 {
             for (int j = i + 1; j < courseAL.size(); j++) {
                 if (haveCommonStudents(courseAL.get(i), courseAL.get(j))) {
                     model.allDifferent(vars.get(i), vars.get(j)).post();
+
+
                 }
             }
         }
@@ -227,7 +280,7 @@ INSERT INTO `student_course_table` (`STUDENT_NUMBER`, `COURSE_LABEL`) VALUES
         for (int i = 0; i < courseAL.size(); i++) {
             Statement stmt = connection.createStatement();
             //String s="SELECT * FROM student_course_table where COURSE_LABEL='"+courseAL.get(i).getLabel()+"'";
-            ResultSet course_student = stmt.executeQuery("SELECT * FROM student_course_table where COURSE_LABEL='" + courseAL.get(i).getLabel() + "'");
+            ResultSet course_student = stmt.executeQuery("SELECT * FROM student_course_table where course_id='"+i+"'");
 
             while (course_student.next()) {
                 courseAL.get(i).addStudent(students.get(Integer.valueOf(course_student.getString("STUDENT_NUMBER")) - 1));
@@ -240,7 +293,7 @@ INSERT INTO `student_course_table` (`STUDENT_NUMBER`, `COURSE_LABEL`) VALUES
 
     }
 
-//################################################################################################################
+    //################################################################################################################
 //################################################################################################################
 //################################################################################################################
 //################################################################################################################
@@ -261,8 +314,10 @@ INSERT INTO `student_course_table` (`STUDENT_NUMBER`, `COURSE_LABEL`) VALUES
     //################################################################################################################
     //################################################################################################################
     public static boolean haveCommonStudents(Course c1, Course c2) {
-        ArrayList<Student> a1 = new ArrayList<Student>();;
-        ArrayList<Student> a2 = new ArrayList<Student>();;
+        ArrayList<Student> a1 = new ArrayList<Student>();
+        ;
+        ArrayList<Student> a2 = new ArrayList<Student>();
+        ;
 
         a1 = c1.getAl();
         a2 = c2.getAl();
