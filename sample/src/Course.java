@@ -19,13 +19,15 @@ public class Course {
     private String label,title,dept;
     private int id;
     private ArrayList al = new ArrayList<Student>();;
+    int variableIndex;
     
     
-    public Course(int id,String label,String title,String dept){
+    public Course(int id,String label,String title,String dept,int varIndex){
         this.id=id;
         this.label=label;
         this.title=title;
         this.dept=dept;
+        this.variableIndex=varIndex;
         
     }
      public Course(String label){

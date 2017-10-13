@@ -36,7 +36,7 @@ public class Course {
         this.dept=dept;
         this.setVariableIndex(variableIndex);
 
-        
+
     }
      public Course(String label){
        
