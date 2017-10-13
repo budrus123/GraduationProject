@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solver;
+import org.chocosolver.solver.constraints.Constraint;
 import org.chocosolver.solver.variables.IntVar;
 
 /**
@@ -31,7 +32,7 @@ public class TryingChoco1 {
 
     //arraylists for the courses, variabls (same as courses) and the students
     static ArrayList<Course> courseAL = new ArrayList<Course>();
-    static ArrayList<IntVar> vars = new ArrayList<IntVar>();
+    static ArrayList<IntVar> variables = new ArrayList<IntVar>();
     static ArrayList<Student> students = new ArrayList<Student>();
 
     //our connection
@@ -107,7 +108,7 @@ public class TryingChoco1 {
         //se7weil i love you <3
 
         System.out.println("Connecting database...");
-
+        int c=0;
         try {
             connection = DriverManager.getConnection(url, username, password);
             System.out.println("Database connected!");
@@ -124,9 +125,9 @@ public class TryingChoco1 {
 //                IntVar temp = model.intVar(getCourses.getString("COURSE_LABEL"), new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 //                    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45}); // phys141 in 1 2 3  
 
-                IntVar temp = model.intVar(getCourses.getString("COURSE_LABEL"),1,200); // phys141 in 1 2 3
-                vars.add(temp);
-                Course co = new Course(Integer.valueOf(getCourses.getString("id")), getCourses.getString("COURSE_LABEL"), getCourses.getString("COURSE TITLE"), getCourses.getString("DEPT"));
+                IntVar temp = model.intVar(getCourses.getString("COURSE_LABEL"),1,38); // phys141 in 1 2 3
+                variables.add(temp);
+                Course co = new Course(Integer.valueOf(getCourses.getString("id")), getCourses.getString("COURSE_LABEL"), getCourses.getString("COURSE TITLE"), getCourses.getString("DEPT"),c++);
                 courseAL.add(co);
 
 
@@ -173,29 +174,48 @@ public class TryingChoco1 {
         in the same day, by looking at the courses any student takes and
         making all their values different
          */
-        oneMaxForEachStudent();
-        
+        //oneMaxForEachStudent();
+
+        for(int p=0;p<students.size();p++){
+            if(students.get(p).getAl().size()>=3){
+                studentHasMoreThanThreeCourses(students.get(p).getAl());
+            }
+        }
+//        Co
         /*
         if the model finds a solutin, print it
         else
         print can't find a solution
         */
-        if (model.getSolver().solve()) {
-            for (int i = 0; i < vars.size(); i++) {
-                System.out.println("course id is "+i+"course timeslot is "+vars.get(i).getValue());
+        int countOfSolution=0;
+        while(model.getSolver().solve()){
+            for (int i = 0; i < variables.size(); i++) {
+                System.out.println(variables.get(i).getValue());
             }
+            System.out.println("solution number "+countOfSolution++);
+            System.out.println(" ");
+            System.out.println(" ");
+            System.out.println(" ");
         }
-//        else if(model.getSolver().){
-//            System.out.println("reached a limit");
+
+
+//        if (model.getSolver().solve()) {
+//            for (int i = 0; i < variables.size(); i++) {
+//                System.out.println(variables.get(i).getValue());
+//            }
 //        }
-        else {
-            System.out.println("no solution");
-        }
+////        else if(model.getSolver().){
+////            System.out.println("reached a limit");
+////        }
+//        else {
+//            System.out.println("no solution");
+//        }
 
 
         long stopTime = System.currentTimeMillis();
         long elapsedTime = stopTime - startTime;
         System.out.println(elapsedTime / 1000.0);
+        //System.out.println(model);
 
     }
 
@@ -204,7 +224,21 @@ public class TryingChoco1 {
     //################################################################################################################
     //################################################################################################################
     //################################################################################################################
+    static public void studentHasMoreThanThreeCourses(ArrayList<Course> courseAL){
 
+        for(int i=0;i<courseAL.size();i++){
+            for(int j=i+2;j<courseAL.size();j++){
+
+               //System.out.println(variables.get(courseAL.get(i).getVariableIndex()) +" "+variables[i+1]+"  "+variables[j]);
+                Constraint th = new Constraint("three in a day "+i+" "+j+"",
+                        new ThreeInADay(new IntVar[]{variables.get(courseAL.get(i).getVariableIndex()),variables.get(courseAL.get(i+1).getVariableIndex()),
+                                variables.get(courseAL.get(j).getVariableIndex())}));
+                //model5.allDifferent(variables).post();;
+                model.post(th);
+            }
+        }
+
+    }
     public static void oneMaxForEachStudent() throws SQLException {
 
         for (int i = 0; i < students.size(); i++) {
@@ -221,7 +255,7 @@ public class TryingChoco1 {
                 IntVar [] studentCourses=new IntVar[count];
 
                 while(getStudentCourses.next()){
-                    studentCourses[q++]=vars.get(Integer.valueOf(getStudentCourses.getString(2))-1);
+                    studentCourses[q++]=variables.get(Integer.valueOf(getStudentCourses.getString(2))-1);
                 }
 
                 for(int m=0;m<count;m++){
@@ -247,7 +281,7 @@ public class TryingChoco1 {
         for (int i = 0; i < courseAL.size(); i++) {
             for (int j = i + 1; j < courseAL.size(); j++) {
                 if (haveCommonStudents(courseAL.get(i), courseAL.get(j))) {
-                    model.allDifferent(vars.get(i), vars.get(j)).post();
+                    model.allDifferent(variables.get(i), variables.get(j)).post();
 
 
                 }
@@ -262,9 +296,14 @@ public class TryingChoco1 {
     //################################################################################################################
     public static void fillStudentTakesCourse() throws SQLException {
 
-//    static ArrayList courseAL = new ArrayList<Course>();
-//    static ArrayList vars = new ArrayList<IntVar>();
-//    static ArrayList students = new ArrayList<Student>();
+        Statement stmt2 = connection.createStatement();
+        //String s="SELECT * FROM student_course_table where COURSE_LABEL='"+courseAL.get(i).getLabel()+"'";
+        ResultSet course_student2 = stmt2.executeQuery("SELECT * FROM student_course_table");
+        while (course_student2.next()){
+            courseAL.get(Integer.valueOf(course_student2.getString("course_id")) - 1).addStudent(students.get(Integer.valueOf(course_student2.getString("STUDENT_NUMBER")) - 1));
+            students.get((Integer.valueOf(course_student2.getString("STUDENT_NUMBER")) - 1)).addCourse(courseAL.get(Integer.valueOf(course_student2.getString("course_id")) - 1));
+        }
+
 /*
 -- Dumping structure for table exams.student_course_table
 CREATE TABLE IF NOT EXISTS `student_course_table` (
@@ -277,19 +316,19 @@ CREATE TABLE IF NOT EXISTS `student_course_table` (
 INSERT INTO `student_course_table` (`STUDENT_NUMBER`, `COURSE_LABEL`) VALUES
 	(1, 'JOUR412'),
          */
-        for (int i = 0; i < courseAL.size(); i++) {
-            Statement stmt = connection.createStatement();
-            //String s="SELECT * FROM student_course_table where COURSE_LABEL='"+courseAL.get(i).getLabel()+"'";
-            ResultSet course_student = stmt.executeQuery("SELECT * FROM student_course_table where course_id='"+i+"'");
-
-            while (course_student.next()) {
-                courseAL.get(i).addStudent(students.get(Integer.valueOf(course_student.getString("STUDENT_NUMBER")) - 1));
-                // System.out.println(course_student.getString("STUDENT_NUMBER"));
-            }
-
-            //System.out.println(s);
-            //System.out.println(courseAL.get(0).getLabel());
-        }
+//        for (int i = 0; i < courseAL.size(); i++) {
+//            Statement stmt = connection.createStatement();
+//            //String s="SELECT * FROM student_course_table where COURSE_LABEL='"+courseAL.get(i).getLabel()+"'";
+//            ResultSet course_student = stmt.executeQuery("SELECT * FROM student_course_table where course_id='"+i+"'");
+//
+//            while (course_student.next()) {
+//                courseAL.get(i).addStudent(students.get(Integer.valueOf(course_student.getString("STUDENT_NUMBER")) - 1));
+//                // System.out.println(course_student.getString("STUDENT_NUMBER"));
+//            }
+//
+//            //System.out.println(s);
+//            //System.out.println(courseAL.get(0).getLabel());
+//        }
 
     }
 

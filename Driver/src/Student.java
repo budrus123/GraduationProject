@@ -14,7 +14,7 @@ public class Student {
 
     private int id;
     private String dept;
-    private ArrayList al = new ArrayList<String>();
+    private ArrayList<Course> studentCourses = new ArrayList<Course>();
 
     ;
             
@@ -47,18 +47,18 @@ public class Student {
      * @return the al
      */
     public ArrayList getAl() {
-        return al;
+        return studentCourses;
     }
 
     /**
      * @param al the al to set
      */
     public void setAl(ArrayList al) {
-        this.al = al;
+        this.studentCourses = al;
     }
 
-    public void addCourse(String course) {
-        al.add(course);
+    public void addCourse(Course course) {
+        studentCourses.add(course);
     }
 
 }

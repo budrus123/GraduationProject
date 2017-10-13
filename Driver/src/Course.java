@@ -24,16 +24,18 @@ public class Course {
     
     private String label,title,dept;
     private int id;
-    
+    private int variableIndex;
     //each course has an arraylist of students of the students that take this course
-    private ArrayList al = new ArrayList<Student>();;
+    private ArrayList <Student>al = new ArrayList<Student>();
     
     
-    public Course(int id,String label,String title,String dept){
+    public Course(int id,String label,String title,String dept,int variableIndex){
         this.id=id;
         this.label=label;
         this.title=title;
         this.dept=dept;
+        this.setVariableIndex(variableIndex);
+
         
     }
      public Course(String label){
@@ -118,5 +120,12 @@ public class Course {
     public void setId(int id) {
         this.id = id;
     }
-    
+
+    public int getVariableIndex() {
+        return variableIndex;
+    }
+
+    public void setVariableIndex(int variableIndex) {
+        this.variableIndex = variableIndex;
+    }
 }
