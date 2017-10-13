@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -178,9 +179,18 @@ public class TryingChoco1 {
 
         for(int p=0;p<students.size();p++){
             if(students.get(p).getAl().size()>=3){
-                studentHasMoreThanThreeCourses(students.get(p).getAl());
+                studentHasThreeOrMore(students.get(p).getAl());
             }
+//            if(students.get(p).getAl().size()>=4){
+//                studentHasFourOrMore(students.get(p).getAl());
+//            }
         }
+
+
+
+
+
+
 //        Co
         /*
         if the model finds a solutin, print it
@@ -188,15 +198,27 @@ public class TryingChoco1 {
         print can't find a solution
         */
         int countOfSolution=0;
-        while(model.getSolver().solve()){
-            for (int i = 0; i < variables.size(); i++) {
-                System.out.println(variables.get(i).getValue());
-            }
-            System.out.println("solution number "+countOfSolution++);
-            System.out.println(" ");
-            System.out.println(" ");
-            System.out.println(" ");
-        }
+//        while(model.getSolver().solve()){
+//            for (int i = 0; i < variables.size(); i++) {
+//                System.out.println(variables.get(i).getValue());
+//            }
+//            System.out.println("solution number "+countOfSolution++);
+//            System.out.println(" ");
+//            System.out.println(" ");
+//            System.out.println(" ");
+//        }
+
+        model.getSolver().solve();
+//            for (int i = 0; i < variables.size(); i++) {
+//                System.out.println(variables.get(i).getValue());
+//            }
+//            System.out.println("solution number "+countOfSolution++);
+//            System.out.println(" ");
+//            System.out.println(" ");
+//            System.out.println(" ");
+            model.getSolver().printStatistics();
+            //System.out.println();
+
 
 
 //        if (model.getSolver().solve()) {
@@ -219,26 +241,60 @@ public class TryingChoco1 {
 
     }
 
-    //################################################################################################################
-    //################################################################################################################
-    //################################################################################################################
-    //################################################################################################################
-    //################################################################################################################
-    static public void studentHasMoreThanThreeCourses(ArrayList<Course> courseAL){
 
-        for(int i=0;i<courseAL.size();i++){
-            for(int j=i+2;j<courseAL.size();j++){
+    //################################################################################################################
+    //################################################################################################################
+    //################################################################################################################
+    //################################################################################################################
+    //################################################################################################################
+    static public void studentHasThreeOrMore(ArrayList<Course> courseAL){
 
-               //System.out.println(variables.get(courseAL.get(i).getVariableIndex()) +" "+variables[i+1]+"  "+variables[j]);
-                Constraint th = new Constraint("three in a day "+i+" "+j+"",
-                        new ThreeInADay(new IntVar[]{variables.get(courseAL.get(i).getVariableIndex()),variables.get(courseAL.get(i+1).getVariableIndex()),
-                                variables.get(courseAL.get(j).getVariableIndex())}));
-                //model5.allDifferent(variables).post();;
-                model.post(th);
-            }
+        int[] input = new int[courseAL.size()];    // input array
+
+        for(int i = 0; i < courseAL.size();i++){
+            input[i] = courseAL.get(i).getVariableIndex();
+        }
+        int k = 3;
+        List<int[]> subsets = Helper_Functions.allCombination(input,k);
+        //System.out.println(variables.get(courseAL.get(i).getVariableIndex()) +" "+variables[i+1]+"  "+variables[j]);
+
+        for (int i = 0; i < subsets.size(); i++)
+        {
+            Constraint th = new Constraint("Three in a day "+i,
+                    new FourExamsInTwoADays(new IntVar[]{variables.get(subsets.get(i)[0]),variables.get(subsets.get(i)[1]),
+                            variables.get(subsets.get(i)[2])}));
+            model.post(th);
+
         }
 
     }
+
+
+    static public void studentHasFourOrMore(ArrayList<Course> courseAL){
+
+        int[] input = new int[courseAL.size()];    // input array
+
+        for(int i = 0; i < courseAL.size();i++){
+            input[i] = courseAL.get(i).getVariableIndex();
+        }
+        int k = 4;
+        List<int[]> subsets = Helper_Functions.allCombination(input,k);
+        //System.out.println(variables.get(courseAL.get(i).getVariableIndex()) +" "+variables[i+1]+"  "+variables[j]);
+
+        for (int i = 0; i < subsets.size(); i++)
+        {
+            Constraint th = new Constraint("Four in two days "+i,
+                    new FourExamsInTwoADays(new IntVar[]{variables.get(subsets.get(i)[0]),variables.get(subsets.get(i)[1]),
+                            variables.get(subsets.get(i)[2]),variables.get(subsets.get(i)[3])}));
+            //model5.allDifferent(variables).post();;
+            model.post(th);
+
+        }
+
+
+
+    }
+
     public static void oneMaxForEachStudent() throws SQLException {
 
         for (int i = 0; i < students.size(); i++) {
