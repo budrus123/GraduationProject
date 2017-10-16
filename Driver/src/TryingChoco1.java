@@ -35,7 +35,7 @@ public class TryingChoco1 {
     static ArrayList<Course> courseAL = new ArrayList<Course>();
     static ArrayList<IntVar> variables = new ArrayList<IntVar>();
     static ArrayList<Student> students = new ArrayList<Student>();
-
+     static int constCounter=0;
     //our connection
     static Connection connection;
 
@@ -126,7 +126,7 @@ public class TryingChoco1 {
 //                IntVar temp = model.intVar(getCourses.getString("COURSE_LABEL"), new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 //                    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45}); // phys141 in 1 2 3  
 
-                IntVar temp = model.intVar(getCourses.getString("COURSE_LABEL"),1,38); // phys141 in 1 2 3
+                IntVar temp = model.intVar(getCourses.getString("COURSE_LABEL"),1,100); // phys141 in 1 2 3
                 variables.add(temp);
                 Course co = new Course(Integer.valueOf(getCourses.getString("id")), getCourses.getString("COURSE_LABEL"), getCourses.getString("COURSE TITLE"), getCourses.getString("DEPT"),c++);
                 courseAL.add(co);
@@ -134,9 +134,9 @@ public class TryingChoco1 {
 
             }
             // end filling up the course arraylist and vars as well
-            
-            
-            
+
+
+
             /*
             this is to fill the student arraylist (all the students)
             */
@@ -183,8 +183,11 @@ public class TryingChoco1 {
             }
 //            if(students.get(p).getAl().size()>=4){
 //                studentHasFourOrMore(students.get(p).getAl());
+//                //System.out.println(students.get(p).getId());
 //            }
         }
+
+        System.out.print("fucked the combos "+ constCounter);
 
 
 
@@ -209,14 +212,15 @@ public class TryingChoco1 {
 //        }
 
         model.getSolver().solve();
-//            for (int i = 0; i < variables.size(); i++) {
-//                System.out.println(variables.get(i).getValue());
-//            }
+            for (int i = 0; i < variables.size(); i++) {
+                System.out.println(variables.get(i).getValue());
+            }
 //            System.out.println("solution number "+countOfSolution++);
 //            System.out.println(" ");
 //            System.out.println(" ");
 //            System.out.println(" ");
             model.getSolver().printStatistics();
+            //System.out.println(model);
             //System.out.println();
 
 
@@ -260,10 +264,14 @@ public class TryingChoco1 {
 
         for (int i = 0; i < subsets.size(); i++)
         {
+            //System.out.println(subsets.get(i)[0]+" "+subsets.get(i)[1]+" "+subsets.get(i)[2]);
             Constraint th = new Constraint("Three in a day "+i,
-                    new FourExamsInTwoADays(new IntVar[]{variables.get(subsets.get(i)[0]),variables.get(subsets.get(i)[1]),
+                    new ThreeInADay(new IntVar[]{variables.get(subsets.get(i)[0]),variables.get(subsets.get(i)[1]),
                             variables.get(subsets.get(i)[2])}));
             model.post(th);
+
+            //System.out.println(th);
+            constCounter++;
 
         }
 
@@ -288,6 +296,8 @@ public class TryingChoco1 {
                             variables.get(subsets.get(i)[2]),variables.get(subsets.get(i)[3])}));
             //model5.allDifferent(variables).post();;
             model.post(th);
+            constCounter++;
+            //System.out.println(th);
 
         }
 

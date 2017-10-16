@@ -32,13 +32,13 @@ public class Helper_Functions {
             courses[2]  = y;
             return courses;
         }
-        if(x.isInstantiated() && z.isInstantiated()){
+        else if(x.isInstantiated() && z.isInstantiated()){
             courses[0]  = y;
             courses[1]  = x;
             courses[2]  = z;
             return courses;
         }
-        if(y.isInstantiated() && z.isInstantiated()){
+        else if(y.isInstantiated() && z.isInstantiated()){
             courses[0]  = x;
             courses[1]  = y;
             courses[2]  = z;

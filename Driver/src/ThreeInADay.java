@@ -24,7 +24,7 @@ public class ThreeInADay extends Propagator<IntVar> {
 
     @Override
     public void propagate(int evtmask) throws ContradictionException {
-
+       // System.out.println(" smth changed");
     }
 
     @Override
