@@ -176,7 +176,6 @@ public class TryingChoco1 {
         making all their values different
          */
         //oneMaxForEachStudent();
-
         for(int p=0;p<students.size();p++){
             if(students.get(p).getAl().size()>=3){
                 studentHasThreeOrMore(students.get(p).getAl());
