@@ -138,4 +138,38 @@ public class Helper_Functions {
     }
 
 
+    public static String createInsertQuery(ArrayList<IntVar> variables,ArrayList<Course> courses,String tableName){
+
+        // INSERT INTO TABLE_NAME (column1, column2, column3,...columnN) VALUES (value1, value2, value3,...valueN);
+        //  (1, 2, 'ANTH335', 'A.Shaheen216', '2017-06-15', 14, 17),
+        //  (2, 'ECON234', 'PALESTINIAN ECONOMICS', 'ECON'),
+
+
+        System.out.println("WWEWWWWW");
+        String query = "INSERT INTO " + tableName + "(STUDENT_NUMBER,COURSE_LABEL,ROOM,EXAM_DATE,START_TIME,END_TIME) VALUES ";
+        int index = 0;
+        String values = "";
+        for (IntVar variable: variables) {
+            int course_id = courses.get(index).getId();
+            String course_label = courses.get(index).getLabel();
+            String room = "x";
+            int start_time = variable.getValue();
+            int end_time = variable.getValue() + 3;
+            String exam_date = "";
+            ArrayList<Student> students = courses.get(index++).getAl();
+            for (Student student:students){
+                int student_number = student.getId();
+                values = values+"("+student_number+","+formatName(course_label)+","+formatName(room)+","+formatName(exam_date)+","+start_time+","+end_time+"),\n";
+            }
+            variable.getValue();
+        }
+        query = query + values + ";";
+        return query;
+    }
+
+
+    public static String formatName(String name){
+        return "'"+name+"'";
+    }
+
 }

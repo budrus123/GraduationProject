@@ -120,7 +120,7 @@ public class TryingChoco1 {
             table from the database
             */
             Statement stmt = connection.createStatement();
-            ResultSet getCourses = stmt.executeQuery("SELECT * FROM course_table");
+            ResultSet getCourses = stmt.executeQuery("SELECT * FROM course_table Order By course_table.id");
             while (getCourses.next()) {
 
 //                IntVar temp = model.intVar(getCourses.getString("COURSE_LABEL"), new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
@@ -211,9 +211,15 @@ public class TryingChoco1 {
 //        }
 
         model.getSolver().solve();
-            for (int i = 0; i < variables.size(); i++) {
-                System.out.println(variables.get(i).getValue());
-            }
+
+            System.out.println("### is " + variables.size());
+
+            String insertQuery = Helper_Functions.createInsertQuery(variables,courseAL,"schedule_table");
+            System.out.println(insertQuery);
+            //
+// for (int i = 0; i < variables.size(); i++) {
+//                System.out.println(variables.get(i).getValue());
+//            }
 //            System.out.println("solution number "+countOfSolution++);
 //            System.out.println(" ");
 //            System.out.println(" ");
