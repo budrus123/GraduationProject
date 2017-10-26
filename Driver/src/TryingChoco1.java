@@ -211,16 +211,18 @@ public class TryingChoco1 {
 //        }
 
         model.getSolver().solve();
-
+        int solution_id = 1;
 
         Statement stmt = connection.createStatement();
         String query = "DELETE FROM solution";
         stmt.executeUpdate(query);  // delete all records in solution.
 
-
-        String insertQuery = Helper_Functions.getSolutionQuery(variables,courseAL,"solution");
+        String insertQuery = Helper_Functions.getSolutionQuery(solution_id++,variables,courseAL,"solution");
         Statement stmt2 = connection.createStatement();
         stmt2.executeUpdate(insertQuery);
+
+
+
             //
 // for (int i = 0; i < variables.size(); i++) {
 //                System.out.println(variables.get(i).getValue());

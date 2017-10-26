@@ -173,8 +173,8 @@ public class Helper_Functions {
     }
 
 
-    public static String getSolutionQuery(ArrayList<IntVar> variables,ArrayList<Course> courses,String tableName){
-        String query = "INSERT INTO " + tableName + "(id,course_id,course_label,time_slot) VALUES ";
+    public static String getSolutionQuery(int solution_id,ArrayList<IntVar> variables,ArrayList<Course> courses,String tableName){
+        String query = "INSERT INTO " + tableName + "(id,solution_id,course_id,course_label,time_slot) VALUES ";
         int index = 0;
         String values = "";
         for (IntVar variable: variables) {
@@ -182,9 +182,9 @@ public class Helper_Functions {
             String course_label = courses.get(index++).getLabel();
             int time_slot = variable.getValue();
             if(index != courses.size())
-                values = values+"("+index +","+course_id+","+formatName(course_label)+","+time_slot+"),\n";
+                values = values+"("+index +"," + solution_id + "," +course_id+","+formatName(course_label)+","+time_slot+"),\n";
             else
-                values = values+"("+index +","+course_id+","+formatName(course_label)+","+time_slot+");\n";
+                values = values+"("+index + ","+ solution_id + "," +course_id+","+formatName(course_label)+","+time_slot+");\n";
 
         }
         query = query + values;
