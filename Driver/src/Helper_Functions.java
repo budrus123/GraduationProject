@@ -172,4 +172,23 @@ public class Helper_Functions {
         return "'"+name+"'";
     }
 
+
+    public static String getSolutionQuery(ArrayList<IntVar> variables,ArrayList<Course> courses,String tableName){
+        String query = "INSERT INTO " + tableName + "(id,course_id,course_label,time_slot) VALUES ";
+        int index = 0;
+        String values = "";
+        for (IntVar variable: variables) {
+            int course_id = courses.get(index).getId();
+            String course_label = courses.get(index++).getLabel();
+            int time_slot = variable.getValue();
+            if(index != courses.size())
+                values = values+"("+index +","+course_id+","+formatName(course_label)+","+time_slot+"),\n";
+            else
+                values = values+"("+index +","+course_id+","+formatName(course_label)+","+time_slot+");\n";
+
+        }
+        query = query + values;
+        return query;
+    }
+
 }

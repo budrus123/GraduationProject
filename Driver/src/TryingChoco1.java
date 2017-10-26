@@ -212,10 +212,15 @@ public class TryingChoco1 {
 
         model.getSolver().solve();
 
-            System.out.println("### is " + variables.size());
 
-            String insertQuery = Helper_Functions.createInsertQuery(variables,courseAL,"schedule_table");
-            System.out.println(insertQuery);
+        Statement stmt = connection.createStatement();
+        String query = "DELETE FROM solution";
+        stmt.executeUpdate(query);  // delete all records in solution.
+
+
+        String insertQuery = Helper_Functions.getSolutionQuery(variables,courseAL,"solution");
+        Statement stmt2 = connection.createStatement();
+        stmt2.executeUpdate(insertQuery);
             //
 // for (int i = 0; i < variables.size(); i++) {
 //                System.out.println(variables.get(i).getValue());
