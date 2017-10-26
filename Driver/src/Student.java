@@ -46,7 +46,7 @@ public class Student {
     /**
      * @return the al
      */
-    public ArrayList getAl() {
+    public ArrayList getCourses() {
         return studentCourses;
     }
 

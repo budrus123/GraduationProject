@@ -4,11 +4,7 @@
  * and open the template in the editor.
  */
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -30,12 +26,12 @@ public class TryingChoco1 {
 
     //model for the problem
     static Model model = new Model("my first problem");
-
+    static int fourInTwoCounter=0;
     //arraylists for the courses, variabls (same as courses) and the students
     static ArrayList<Course> courseAL = new ArrayList<Course>();
     static ArrayList<IntVar> variables = new ArrayList<IntVar>();
     static ArrayList<Student> students = new ArrayList<Student>();
-     static int constCounter=0;
+    static int constCounter = 0;
     //our connection
     static Connection connection;
 
@@ -109,7 +105,7 @@ public class TryingChoco1 {
         //se7weil i love you <3
 
         System.out.println("Connecting database...");
-        int c=0;
+        int c = 0;
         try {
             connection = DriverManager.getConnection(url, username, password);
             System.out.println("Database connected!");
@@ -126,9 +122,9 @@ public class TryingChoco1 {
 //                IntVar temp = model.intVar(getCourses.getString("COURSE_LABEL"), new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 //                    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45}); // phys141 in 1 2 3  
 
-                IntVar temp = model.intVar(getCourses.getString("COURSE_LABEL"),1,100); // phys141 in 1 2 3
+                IntVar temp = model.intVar(getCourses.getString("COURSE_LABEL"), 1, 100); // phys141 in 1 2 3
                 variables.add(temp);
-                Course co = new Course(Integer.valueOf(getCourses.getString("id")), getCourses.getString("COURSE_LABEL"), getCourses.getString("COURSE TITLE"), getCourses.getString("DEPT"),c++);
+                Course co = new Course(Integer.valueOf(getCourses.getString("id")), getCourses.getString("COURSE_LABEL"), getCourses.getString("COURSE TITLE"), getCourses.getString("DEPT"), c++);
                 courseAL.add(co);
 
 
@@ -176,21 +172,17 @@ public class TryingChoco1 {
         making all their values different
          */
         //oneMaxForEachStudent();
-        for(int p=0;p<students.size();p++){
-            if(students.get(p).getAl().size()>=3){
-                studentHasThreeOrMore(students.get(p).getAl());
+        for (int p = 0; p < students.size(); p++) {
+            if (students.get(p).getCourses().size() >= 3) {
+                studentHasThreeOrMore(students.get(p).getCourses());
             }
-//            if(students.get(p).getAl().size()>=4){
-//                studentHasFourOrMore(students.get(p).getAl());
-//                //System.out.println(students.get(p).getId());
-//            }
+            if(students.get(p).getCourses().size()>=4){
+                studentHasFourOrMore(students.get(p).getCourses());
+                //System.out.println(students.get(p).getId());
+            }
         }
 
-        System.out.print("fucked the combos "+ constCounter);
-
-
-
-
+        System.out.print("done with the combos " + constCounter);
 
 
 //        Co
@@ -199,7 +191,7 @@ public class TryingChoco1 {
         else
         print can't find a solution
         */
-        int countOfSolution=0;
+        int countOfSolution = 0;
 //        while(model.getSolver().solve()){
 //            for (int i = 0; i < variables.size(); i++) {
 //                System.out.println(variables.get(i).getValue());
@@ -217,13 +209,12 @@ public class TryingChoco1 {
         String query = "DELETE FROM solution";
         stmt.executeUpdate(query);  // delete all records in solution.
 
-        String insertQuery = Helper_Functions.getSolutionQuery(solution_id++,variables,courseAL,"solution");
+        String insertQuery = Helper_Functions.getSolutionQuery(solution_id++, variables, courseAL, "solution");
         Statement stmt2 = connection.createStatement();
         stmt2.executeUpdate(insertQuery);
 
 
-
-            //
+        //
 // for (int i = 0; i < variables.size(); i++) {
 //                System.out.println(variables.get(i).getValue());
 //            }
@@ -231,10 +222,9 @@ public class TryingChoco1 {
 //            System.out.println(" ");
 //            System.out.println(" ");
 //            System.out.println(" ");
-            model.getSolver().printStatistics();
-            //System.out.println(model);
-            //System.out.println();
-
+        model.getSolver().printStatistics();
+        //System.out.println(model);
+        //System.out.println();
 
 
 //        if (model.getSolver().solve()) {
@@ -253,32 +243,132 @@ public class TryingChoco1 {
         long stopTime = System.currentTimeMillis();
         long elapsedTime = stopTime - startTime;
         System.out.println(elapsedTime / 1000.0);
+        System.out.println("\n\nchecking if the solution found is valid!");
+        validateSolution();
+        System.out.println("number of students who have 4 exams in 2 days is:"+fourInTwoCounter);
+
         //System.out.println(model);
 
     }
 
+    //################################################################################################################
+    public static void validateSolution() {
+        int flag = 0;
+
+        for (int i = 0; i < students.size(); i++) {
+            ArrayList<Integer> studentExams = new ArrayList<Integer>();
+            for (int k = 0; k < students.get(i).getCourses().size(); k++) {
+                Course cid = (Course) students.get(i).getCourses().get(k);
+                studentExams.add(variables.get(cid.getVariableIndex()).getValue());
+                //student exams has the timeslots the student has exams in
+                //System.out.println(variables.get(cid.getVariableIndex()).getValue());
+
+            }
+
+            //to check if any two time slots are the same
+            FourInTwo(studentExams);
+            if (!checkIfTwoSlotsSame(studentExams) || !checkIfThreeSameDay(studentExams)) {
+                System.out.println(studentExams + "  "+ students.get(i).getId());
+                flag = 1;
+//                System.out.println(studentExams+"\n"+students.get(i).getId());
+            }
+        }
+        if(flag==0)
+            System.out.println("***********solution is valid***********");
+        else
+            System.out.println("solution is not valid");
+
+    }
+
+    //################################################################################################################
+    //################################################################################################################
+    public static void FourInTwo (ArrayList<Integer> slots) {
+        int[] input = new int[slots.size()];    // input array
+        for (int i = 0; i < slots.size(); i++) {
+            input[i] = slots.get(i);
+        }
+        int k = 4;
+        List<int[]> subsets = Helper_Functions.allCombination(input, k);
+        /*combo of all the time slots for a student
+        this is to see if any three exams or slots
+        are in the same day*/
+
+        for (int i = 0; i < subsets.size(); i++) {
+            if(Helper_Functions.fourExamsInTwoDays(subsets.get(i)[0],subsets.get(i)[1]) &&
+                    Helper_Functions.fourExamsInTwoDays(subsets.get(i)[0],subsets.get(i)[2]) &&
+                    Helper_Functions.fourExamsInTwoDays(subsets.get(i)[0],subsets.get(i)[3])&&
+                    Helper_Functions.fourExamsInTwoDays(subsets.get(i)[1],subsets.get(i)[2])&&
+                    Helper_Functions.fourExamsInTwoDays(subsets.get(i)[1],subsets.get(i)[3])&&
+                    Helper_Functions.fourExamsInTwoDays(subsets.get(i)[2],subsets.get(i)[3])){
+                fourInTwoCounter++;
+                System.out.println(slots+" "+ subsets.get(i)[0]+","+subsets.get(i)[1]+","+subsets.get(i)[2]+","+subsets.get(i)[3]);
+            }
+
+        }
+    }
+
+
+
+    //################################################################################################################
+    //################################################################################################################
+
+    public static boolean checkIfThreeSameDay(ArrayList<Integer> slots) {
+        int[] input = new int[slots.size()];    // input array
+        for (int i = 0; i < slots.size(); i++) {
+            input[i] = slots.get(i);
+        }
+        int k = 3;
+        List<int[]> subsets = Helper_Functions.allCombination(input, k);
+        /*combo of all the time slots for a student
+        this is to see if any three exams or slots
+        are in the same day*/
+
+        for (int i = 0; i < subsets.size(); i++) {
+            if(Helper_Functions.haveSameDay(subsets.get(i)[0],subsets.get(i)[1]) &&
+                    Helper_Functions.haveSameDay(subsets.get(i)[0],subsets.get(i)[2])){
+                return false;
+            }
+
+        }
+
+        return true;
+    }
+
+    //################################################################################################################
+    //################################################################################################################
+    public static boolean checkIfTwoSlotsSame(ArrayList<Integer> slots) {
+
+        for (int i = 0; i < slots.size(); i++) {
+            for (int k = i + 1; k < slots.size(); k++) {
+                if (slots.get(k) == slots.get(i)) {
+                    System.out.println(slots);
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
 
     //################################################################################################################
     //################################################################################################################
     //################################################################################################################
     //################################################################################################################
-    //################################################################################################################
-    static public void studentHasThreeOrMore(ArrayList<Course> courseAL){
+    static public void studentHasThreeOrMore(ArrayList<Course> courseAL) {
 
         int[] input = new int[courseAL.size()];    // input array
 
-        for(int i = 0; i < courseAL.size();i++){
+        for (int i = 0; i < courseAL.size(); i++) {
             input[i] = courseAL.get(i).getVariableIndex();
         }
         int k = 3;
-        List<int[]> subsets = Helper_Functions.allCombination(input,k);
+        List<int[]> subsets = Helper_Functions.allCombination(input, k);
         //System.out.println(variables.get(courseAL.get(i).getVariableIndex()) +" "+variables[i+1]+"  "+variables[j]);
 
-        for (int i = 0; i < subsets.size(); i++)
-        {
+        for (int i = 0; i < subsets.size(); i++) {
             //System.out.println(subsets.get(i)[0]+" "+subsets.get(i)[1]+" "+subsets.get(i)[2]);
-            Constraint th = new Constraint("Three in a day "+i,
-                    new ThreeInADay(new IntVar[]{variables.get(subsets.get(i)[0]),variables.get(subsets.get(i)[1]),
+            Constraint th = new Constraint("Three in a day " + i,
+                    new ThreeInADay(new IntVar[]{variables.get(subsets.get(i)[0]), variables.get(subsets.get(i)[1]),
                             variables.get(subsets.get(i)[2])}));
             model.post(th);
 
@@ -290,22 +380,21 @@ public class TryingChoco1 {
     }
 
 
-    static public void studentHasFourOrMore(ArrayList<Course> courseAL){
+    static public void studentHasFourOrMore(ArrayList<Course> courseAL) {
 
         int[] input = new int[courseAL.size()];    // input array
 
-        for(int i = 0; i < courseAL.size();i++){
+        for (int i = 0; i < courseAL.size(); i++) {
             input[i] = courseAL.get(i).getVariableIndex();
         }
         int k = 4;
-        List<int[]> subsets = Helper_Functions.allCombination(input,k);
+        List<int[]> subsets = Helper_Functions.allCombination(input, k);
         //System.out.println(variables.get(courseAL.get(i).getVariableIndex()) +" "+variables[i+1]+"  "+variables[j]);
 
-        for (int i = 0; i < subsets.size(); i++)
-        {
-            Constraint th = new Constraint("Four in two days "+i,
-                    new FourExamsInTwoADays(new IntVar[]{variables.get(subsets.get(i)[0]),variables.get(subsets.get(i)[1]),
-                            variables.get(subsets.get(i)[2]),variables.get(subsets.get(i)[3])}));
+        for (int i = 0; i < subsets.size(); i++) {
+            Constraint th = new Constraint("Four in two days " + i,
+                    new FourExamsInTwoADays(new IntVar[]{variables.get(subsets.get(i)[0]), variables.get(subsets.get(i)[1]),
+                            variables.get(subsets.get(i)[2]), variables.get(subsets.get(i)[3])}));
             //model5.allDifferent(variables).post();;
             model.post(th);
             constCounter++;
@@ -314,31 +403,30 @@ public class TryingChoco1 {
         }
 
 
-
     }
 
     public static void oneMaxForEachStudent() throws SQLException {
 
         for (int i = 0; i < students.size(); i++) {
             Statement stmt = connection.createStatement();
-            ResultSet getStudentCourses = stmt.executeQuery("SELECT * FROM student_course_table where STUDENT_NUMBER='"+(i+1)+"'");
+            ResultSet getStudentCourses = stmt.executeQuery("SELECT * FROM student_course_table where STUDENT_NUMBER='" + (i + 1) + "'");
             Statement stmt2 = connection.createStatement();
-            ResultSet getStudentCoursesCount = stmt2.executeQuery("SELECT count(*) FROM student_course_table where STUDENT_NUMBER='" +(i+1)+"'");
+            ResultSet getStudentCoursesCount = stmt2.executeQuery("SELECT count(*) FROM student_course_table where STUDENT_NUMBER='" + (i + 1) + "'");
 
             getStudentCoursesCount.next();
-            int count=Integer.valueOf(getStudentCoursesCount.getString(1));
+            int count = Integer.valueOf(getStudentCoursesCount.getString(1));
             //System.out.println(getStudentCoursesCount.getString(1));
-            int q=0;
-            if(count>1){
-                IntVar [] studentCourses=new IntVar[count];
+            int q = 0;
+            if (count > 1) {
+                IntVar[] studentCourses = new IntVar[count];
 
-                while(getStudentCourses.next()){
-                    studentCourses[q++]=variables.get(Integer.valueOf(getStudentCourses.getString(2))-1);
+                while (getStudentCourses.next()) {
+                    studentCourses[q++] = variables.get(Integer.valueOf(getStudentCourses.getString(2)) - 1);
                 }
 
-                for(int m=0;m<count;m++){
-                    for(int n=m;n<count;n++){
-                        model.arithm(studentCourses[m], "-",studentCourses[n] , ">", 2).post();
+                for (int m = 0; m < count; m++) {
+                    for (int n = m; n < count; n++) {
+                        model.arithm(studentCourses[m], "-", studentCourses[n], ">", 2).post();
 
                     }
                 }
@@ -377,7 +465,7 @@ public class TryingChoco1 {
         Statement stmt2 = connection.createStatement();
         //String s="SELECT * FROM student_course_table where COURSE_LABEL='"+courseAL.get(i).getLabel()+"'";
         ResultSet course_student2 = stmt2.executeQuery("SELECT * FROM student_course_table");
-        while (course_student2.next()){
+        while (course_student2.next()) {
             courseAL.get(Integer.valueOf(course_student2.getString("course_id")) - 1).addStudent(students.get(Integer.valueOf(course_student2.getString("STUDENT_NUMBER")) - 1));
             students.get((Integer.valueOf(course_student2.getString("STUDENT_NUMBER")) - 1)).addCourse(courseAL.get(Integer.valueOf(course_student2.getString("course_id")) - 1));
         }
