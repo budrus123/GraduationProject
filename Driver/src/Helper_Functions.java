@@ -107,6 +107,18 @@ public class Helper_Functions {
         return result;
     }
 
+    public static boolean fourInTwo(int [] arr){
+        Arrays.sort(arr);
+        int min=arr[0];
+        int max=arr[3];
+
+        if((Math.abs((Math.ceil(max/3))-(Math.ceil(min/3)))) >= 2 )
+            return false;
+
+        return  true;
+
+    }
+
     public static List<int[]> allCombination(int[] input, int k){
 
         List<int[]> subsets = new ArrayList<>();
