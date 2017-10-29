@@ -150,7 +150,9 @@ public class TryingChoco1 {
         long elapsedTime = stopTime - startTime;
         System.out.println(elapsedTime / 1000.0);
         System.out.println("\n\nchecking if the solution found is valid!");
+        fillStudentSlots();
         validateSolution();
+        calculateStats();
         System.out.println("number of students who have 4 exams in 2 days is:" + fourInTwoCounter);
 
 
@@ -165,6 +167,90 @@ public class TryingChoco1 {
         D
          */
     }
+
+    //################################################################################################################
+    public static void calculateStats() {
+        for(int i=2;i<4;i++){
+            System.out.println("\n***printing stats for student number "+ i+" ***");
+            calculateFullExamLengeth(students.get(i),i);
+            calculateAvgDaysBetweenExams(students.get(i),i);
+            calculateVarianceOfSpace(students.get(i),i);
+            System.out.println(" ");
+
+        }
+    }
+    //################################################################################################################
+
+
+    //################################################################################################################
+    public static void calculateVarianceOfSpace(Student stu,int q) {
+        int [][] s2D = stu.getSlots2D();
+        double sum=0;
+        int count=0;
+        for(int i=(stu.getFirstSlot()-1)/3;i<(stu.getLastSlot()-1)/3;i++){
+            if(i==(stu.getFirstSlot()-1)/3){
+                continue;
+            }
+            if((s2D[i][0]==0)&&(s2D[i][1]==0)&&(s2D[i][2]==0)){
+                count++;
+            }
+            if((s2D[i][0]==1)||(s2D[i][1]==1)||(s2D[i][2]==1)){
+                sum+=Math.pow((double)count-stu.getAvgDaysBetweenExams(),2);
+                count=0;
+            }
+
+
+        }
+
+        students.get(q).setVarianceOfSpaces(sum/(double)stu.getSlots().size());
+        System.out.println("Variance of number of days between exams is "+students.get(q).getVarianceOfSpaces()+" days");
+    }
+    //################################################################################################################
+
+
+
+    //################################################################################################################
+    public static void calculateAvgDaysBetweenExams(Student stu,int q) {
+       int [][] s2D = stu.getSlots2D();
+       int count=0;
+       for(int i=(stu.getFirstSlot()-1)/3;i<(stu.getLastSlot()-1)/3;i++){
+           if((s2D[i][0]==0)&&(s2D[i][1]==0)&&(s2D[i][2]==0)){
+               count++;
+           }
+
+       }
+
+        students.get(q).setAvgDaysBetweenExams((count)/(double)stu.getSlots().size());
+        System.out.println("Average number of days between exams is "+(count)/((double)stu.getSlots().size()-1)+" days");
+    }
+    //################################################################################################################
+
+
+
+
+
+    //################################################################################################################
+    public static void calculateFullExamLengeth(Student stu,int k) {
+        int firstSlot,LastSlot;
+        //Integer [] stuSlots=Arrays.sort((Integer [])stu.getSlots().toArray());
+        int[] stuSlots=stu.getSlots().stream().mapToInt(i->i).toArray(); //array list to array
+        Arrays.sort(stuSlots);
+        firstSlot=stuSlots[0];
+        LastSlot=stuSlots[stuSlots.length-1];
+        int leng= (((LastSlot -1)/3) - ((firstSlot -1)/3)) +1;
+        students.get(k).setExamsLen(leng);
+        students.get(k).setFirstSlot(firstSlot);
+        students.get(k).setLastSlot(LastSlot);
+        System.out.println("lengeth of exam period is "+leng+" days");
+        int firstDay=((firstSlot-1)/3)+1;
+        int lastDay=((LastSlot-1)/3)+1;
+        System.out.println("first exam is on day number "+firstDay);
+        System.out.println("last exam is on day number "+lastDay);
+    }
+    //################################################################################################################
+
+
+
 
     //################################################################################################################
     public static int eval1(ArrayList<int[]> days) { //scoring same as s7s old function
@@ -200,23 +286,31 @@ public class TryingChoco1 {
 
 
     //################################################################################################################
-    public static void validateSolution() {
+    public static void fillStudentSlots() {
         int flag = 0;
 
-        for (int i = 0; i < students.size(); i++) {
+        for (int i = 2; i < 4; i++) {
             ArrayList<Integer> studentExams = new ArrayList<Integer>();
             for (int k = 0; k < students.get(i).getCourses().size(); k++) {
                 Course cid = (Course) students.get(i).getCourses().get(k);
                 studentExams.add(variables.get(cid.getVariableIndex()).getValue());
                 //student exams has the timeslots the student has exams in
-                //System.out.println(variables.get(cid.getVariableIndex()).getValue());
-
             }
+            students.get(i).setSlots(studentExams);
 
-            //to check if any two time slots are the same
-            FourInTwo(studentExams);
-            if (!checkIfTwoSlotsSame(studentExams) || !checkIfThreeSameDay(studentExams)) {
-                System.out.println(studentExams + "  " + students.get(i).getId());
+        }
+    }
+    //################################################################################################################
+
+
+    //################################################################################################################
+    public static void validateSolution() {
+        int flag = 0;
+        for (int i = 2; i < 4; i++) {
+            //count the number of students who have 4 in 2
+            FourInTwo(students.get(i).getSlots());
+            if (!checkIfTwoSlotsSame(students.get(i).getSlots()) || !checkIfThreeSameDay(students.get(i).getSlots())) {
+                System.out.println(students.get(i).getSlots() + "  " + students.get(i).getId());
                 flag = 1;
 //                System.out.println(studentExams+"\n"+students.get(i).getId());
             }
