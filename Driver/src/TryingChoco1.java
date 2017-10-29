@@ -6,14 +6,17 @@
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.IntStream;
 
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.Constraint;
 import org.chocosolver.solver.variables.IntVar;
+import org.chocosolver.util.tools.ArrayUtils;
 
 /**
  * @author Mahmoud
@@ -150,7 +153,51 @@ public class TryingChoco1 {
         validateSolution();
         System.out.println("number of students who have 4 exams in 2 days is:" + fourInTwoCounter);
 
+
+        /*
+        M A I N   E N D
+        A
+        I
+        N
+
+        E
+        N
+        D
+         */
     }
+
+    //################################################################################################################
+    public static int eval1(ArrayList<int[]> days) { //scoring same as s7s old function
+        int score = 0;
+        int size = days.size();
+        int dayInc = 0;
+        int flag = 0;
+        for (int i = days.size() - 1; i >= 0; i--) {
+            if (Arrays.asList(days.get(i)).contains(1)) { //check if we have exam that day
+                dayInc = 1;
+                if (IntStream.of(days.get(i)).sum() > 1) {
+                    flag = 1;
+                } else {
+                    flag = 0;
+                }
+                //continue;
+
+
+            } else {
+                if (dayInc > 2) {
+                    score += 3;
+                } else if (flag == 0) {
+                    score += 12;
+                } else if (flag == 1) {
+                    score += 6;
+                }
+            }
+        }
+
+        return score;
+    }
+    //################################################################################################################
+
 
     //################################################################################################################
     public static void validateSolution() {
@@ -205,7 +252,6 @@ public class TryingChoco1 {
     //################################################################################################################
 
 
-
     //################################################################################################################
     public static boolean checkIfThreeSameDay(ArrayList<Integer> slots) {
         int[] input = new int[slots.size()];    // input array
@@ -248,7 +294,6 @@ public class TryingChoco1 {
     //################################################################################################################
 
 
-
     //################################################################################################################
     static public void studentHasThreeOrMore(ArrayList<Course> courseAL) {
 
@@ -277,7 +322,6 @@ public class TryingChoco1 {
     //################################################################################################################
 
 
-
     //################################################################################################################
     static public void studentHasFourOrMore(ArrayList<Course> courseAL) {
 
@@ -304,7 +348,6 @@ public class TryingChoco1 {
 
     }
     //################################################################################################################
-
 
 
     //################################################################################################################
@@ -342,8 +385,6 @@ public class TryingChoco1 {
     //################################################################################################################
 
 
-
-
     //################################################################################################################
     public static void fillHardConst() throws SQLException {
         for (int i = 0; i < courseAL.size(); i++) {
@@ -357,7 +398,6 @@ public class TryingChoco1 {
         }
     }
     //################################################################################################################
-
 
 
     //################################################################################################################
@@ -376,8 +416,6 @@ public class TryingChoco1 {
     //################################################################################################################
 
 
-
-
     //################################################################################################################
     public static IntVar getCourseIntVar(Course c) {
 
@@ -389,7 +427,6 @@ public class TryingChoco1 {
         return null;
     }
     //################################################################################################################
-
 
 
     //################################################################################################################
