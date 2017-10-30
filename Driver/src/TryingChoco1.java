@@ -170,24 +170,36 @@ public class TryingChoco1 {
 
     //################################################################################################################
     public static void calculateStats() {
-        for(int i=2;i<4;i++){
-            System.out.println("\n***printing stats for student number "+ i+" ***");
-            calculateFullExamLengeth(students.get(i),i);
-            calculateAvgDaysBetweenExams(students.get(i),i);
-            calculateVarianceOfSpace(students.get(i),i);
-            System.out.println(" ");
+        double avgSum=0;
+        double varSum=0;
+        int countHasExams=0;
+        for(int i=0;i<students.size();i++){
+            //System.out.println("\n***printing stats for student number "+ i+" ***");
+
+            if(students.get(i).getSlots().size()>0){
+                //students.get(i).printSlots();
+                calculateFullExamLengeth(students.get(i),i);
+                avgSum+=calculateAvgDaysBetweenExams(students.get(i),i);
+                varSum+=calculateVarianceOfSpace(students.get(i),i);
+
+                //System.out.println(" ");
+                countHasExams++;
+            }
 
         }
+        System.out.println("average mean of the solution = "+(avgSum/countHasExams));
+        System.out.println("average variance of the solution = "+(varSum/countHasExams));
     }
     //################################################################################################################
 
 
     //################################################################################################################
-    public static void calculateVarianceOfSpace(Student stu,int q) {
+    public static double calculateVarianceOfSpace(Student stu,int q) {
         int [][] s2D = stu.getSlots2D();
         double sum=0;
         int count=0;
-        for(int i=(stu.getFirstSlot()-1)/3;i<(stu.getLastSlot()-1)/3;i++){
+        for(int i=(stu.getFirstSlot()-1)/3;i<(((stu.getLastSlot()-1)/3)+1);i++){
+            //System.out.println("i is -> "+i);
             if(i==(stu.getFirstSlot()-1)/3){
                 continue;
             }
@@ -195,22 +207,50 @@ public class TryingChoco1 {
                 count++;
             }
             if((s2D[i][0]==1)||(s2D[i][1]==1)||(s2D[i][2]==1)){
-                sum+=Math.pow((double)count-stu.getAvgDaysBetweenExams(),2);
-                count=0;
+                if (s2D[i][0] == 1) {
+                    sum+=Math.pow((double)count-stu.getAvgDaysBetweenExams(),2);
+                    //System.out.println("added power -> "+Math.pow((double)count-stu.getAvgDaysBetweenExams(),2));
+                    count=0;
+                }
+                 if (s2D[i][1] ==1) {
+                    sum+=Math.pow((double)count-stu.getAvgDaysBetweenExams(),2);
+                    //System.out.println("added power -> "+Math.pow((double)count-stu.getAvgDaysBetweenExams(),2));
+
+                    count=0;
+                }
+                 if (s2D[i][2] == 1){
+                    sum+=Math.pow((double)count-stu.getAvgDaysBetweenExams(),2);
+                    //System.out.println("added power -> "+Math.pow((double)count-stu.getAvgDaysBetweenExams(),2));
+
+                    count=0;
+                }
+
             }
 
 
         }
+        int m=(stu.getFirstSlot()-1)/3;
+        int numofExamsFirstDay=s2D[m][0]+s2D[m][1]+s2D[m][2];
+        //System.out.println("num in fDay -> "+numofExamsFirstDay);
+        double var=sum/((double)stu.getSlots().size() - numofExamsFirstDay-1);
+        if(Double.isNaN(var)){
+            students.get(q).setVarianceOfSpaces(0);
 
-        students.get(q).setVarianceOfSpaces(sum/(double)stu.getSlots().size());
-        System.out.println("Variance of number of days between exams is "+students.get(q).getVarianceOfSpaces()+" days");
+        }
+        else{
+            students.get(q).setVarianceOfSpaces(sum/((double)stu.getSlots().size() - numofExamsFirstDay-1));
+        }
+
+        //System.out.println("Variance of number of days between exams is "+students.get(q).getVarianceOfSpaces()+" days");
+        return students.get(q).getVarianceOfSpaces();
+        //System.out.println("num is -> "+((double)stu.getSlots().size() - numofExamsFirstDay-1));
     }
     //################################################################################################################
 
 
 
     //################################################################################################################
-    public static void calculateAvgDaysBetweenExams(Student stu,int q) {
+    public static double calculateAvgDaysBetweenExams(Student stu,int q) {
        int [][] s2D = stu.getSlots2D();
        int count=0;
        for(int i=(stu.getFirstSlot()-1)/3;i<(stu.getLastSlot()-1)/3;i++){
@@ -219,9 +259,17 @@ public class TryingChoco1 {
            }
 
        }
-
-        students.get(q).setAvgDaysBetweenExams((count)/(double)stu.getSlots().size());
-        System.out.println("Average number of days between exams is "+(count)/((double)stu.getSlots().size()-1)+" days");
+        int m=(stu.getFirstSlot()-1)/3;
+        int numofExamsFirstDay=s2D[m][0]+s2D[m][1]+s2D[m][2];
+        double avg=(count)/((double)stu.getSlots().size() - numofExamsFirstDay);
+        if(Double.isNaN(avg)){
+            students.get(q).setAvgDaysBetweenExams(0);
+        }
+        else{
+            students.get(q).setAvgDaysBetweenExams(avg);
+        }
+       // System.out.println("Average number of days between exams is "+(count)/((double)stu.getSlots().size()-1)+" days");
+        return students.get(q).getAvgDaysBetweenExams();
     }
     //################################################################################################################
 
@@ -233,19 +281,22 @@ public class TryingChoco1 {
     public static void calculateFullExamLengeth(Student stu,int k) {
         int firstSlot,LastSlot;
         //Integer [] stuSlots=Arrays.sort((Integer [])stu.getSlots().toArray());
-        int[] stuSlots=stu.getSlots().stream().mapToInt(i->i).toArray(); //array list to array
-        Arrays.sort(stuSlots);
-        firstSlot=stuSlots[0];
-        LastSlot=stuSlots[stuSlots.length-1];
-        int leng= (((LastSlot -1)/3) - ((firstSlot -1)/3)) +1;
-        students.get(k).setExamsLen(leng);
-        students.get(k).setFirstSlot(firstSlot);
-        students.get(k).setLastSlot(LastSlot);
-        System.out.println("lengeth of exam period is "+leng+" days");
-        int firstDay=((firstSlot-1)/3)+1;
-        int lastDay=((LastSlot-1)/3)+1;
-        System.out.println("first exam is on day number "+firstDay);
-        System.out.println("last exam is on day number "+lastDay);
+
+            int[] stuSlots=stu.getSlots().stream().mapToInt(i->i).toArray(); //array list to array
+            Arrays.sort(stuSlots);
+            firstSlot=stuSlots[0];
+            LastSlot=stuSlots[stuSlots.length-1];
+            int leng= (((LastSlot -1)/3) - ((firstSlot -1)/3)) +1;
+            students.get(k).setExamsLen(leng);
+            students.get(k).setFirstSlot(firstSlot);
+            students.get(k).setLastSlot(LastSlot);
+            //System.out.println("lengeth of exam period is "+leng+" days");
+            int firstDay=((firstSlot-1)/3)+1;
+            int lastDay=((LastSlot-1)/3)+1;
+            //System.out.println("first exam is on day number "+firstDay);
+            //System.out.println("last exam is on day number "+lastDay);
+
+
     }
     //################################################################################################################
 
@@ -289,7 +340,7 @@ public class TryingChoco1 {
     public static void fillStudentSlots() {
         int flag = 0;
 
-        for (int i = 2; i < 4; i++) {
+        for (int i = 0; i < students.size(); i++) {
             ArrayList<Integer> studentExams = new ArrayList<Integer>();
             for (int k = 0; k < students.get(i).getCourses().size(); k++) {
                 Course cid = (Course) students.get(i).getCourses().get(k);
@@ -306,7 +357,7 @@ public class TryingChoco1 {
     //################################################################################################################
     public static void validateSolution() {
         int flag = 0;
-        for (int i = 2; i < 4; i++) {
+        for (int i = 0; i < students.size(); i++) {
             //count the number of students who have 4 in 2
             FourInTwo(students.get(i).getSlots());
             if (!checkIfTwoSlotsSame(students.get(i).getSlots()) || !checkIfThreeSameDay(students.get(i).getSlots())) {

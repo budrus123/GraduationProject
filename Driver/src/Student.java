@@ -78,7 +78,7 @@ public class Student {
     }
 
     public void convert2D (ArrayList<Integer> slots){
-        int [][] s2D = new int[11][3];
+        int [][] s2D = new int[20][3];
 
         for(int i=0;i<slots.size();i++){
             s2D[(slots.get(i)-1)/3][(slots.get(i)-1)%3]=1;
@@ -88,8 +88,8 @@ public class Student {
         below are just for printing
          */
         this.slots2D=s2D;
-
-        System.out.println(slots);
+        /*
+         System.out.println(slots);
 
         for(int i=0;i<11;i++){
             System.out.print("day "+(i+1)+" -> ");
@@ -98,10 +98,22 @@ public class Student {
             }
             System.out.println("");
         }
+         */
+
 
 
     }
+    public void printSlots() {
+        //System.out.println(slots2D);
 
+        for (int i = 0; i < 20; i++) {
+            System.out.print("day " + (i + 1) + " -> ");
+            for (int k = 0; k < 3; k++) {
+                System.out.print(slots2D[i][k] + " ");
+            }
+            System.out.println("");
+        }
+    }
     public int getExamsLen() {
         return examsLen;
     }
