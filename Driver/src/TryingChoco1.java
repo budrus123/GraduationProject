@@ -59,7 +59,7 @@ public class TryingChoco1 {
             Statement stmt = connection.createStatement();
             ResultSet getCourses = stmt.executeQuery("SELECT * FROM course_table Order By course_table.id");
             while (getCourses.next()) {
-                IntVar temp = model.intVar(getCourses.getString("COURSE_LABEL"), 1, 100); // phys141 in 1 2 3
+                IntVar temp = model.intVar(getCourses.getString("COURSE_LABEL"), 1, 36); // phys141 in 1 2 3
                 variables.add(temp);
                 Course co = new Course(Integer.valueOf(getCourses.getString("id")), getCourses.getString("COURSE_LABEL"), getCourses.getString("COURSE TITLE"), getCourses.getString("DEPT"), c++);
                 courseAL.add(co);
@@ -128,32 +128,37 @@ public class TryingChoco1 {
         print can't find a solution
         */
         int countOfSolution = 0;
-        model.getSolver().solve();
+
         int solution_id = 1;
 
         /*inserting the solution
         into the database
          */
-        Statement stmt = connection.createStatement();
-        String query = "DELETE FROM solution";
-        stmt.executeUpdate(query);  // delete all records in solution.
-        String insertQuery = Helper_Functions.getSolutionQuery(solution_id++, variables, courseAL, "solution");
-        Statement stmt2 = connection.createStatement();
-        stmt2.executeUpdate(insertQuery);
+//        Statement stmt = connection.createStatement();
+//        String query = "DELETE FROM solution";
+//        stmt.executeUpdate(query);  // delete all records in solution.
+//        String insertQuery = Helper_Functions.getSolutionQuery(solution_id++, variables, courseAL, "solution");
+//        Statement stmt2 = connection.createStatement();
+//        stmt2.executeUpdate(insertQuery);
         /*
         done inserting the solution
          */
 
-        model.getSolver().printStatistics();
+        new UniversityData(students);
 
-        long stopTime = System.currentTimeMillis();
-        long elapsedTime = stopTime - startTime;
-        System.out.println(elapsedTime / 1000.0);
-        System.out.println("\n\nchecking if the solution found is valid!");
-        fillStudentSlots();
-        validateSolution();
-        calculateStats();
-        System.out.println("number of students who have 4 exams in 2 days is:" + fourInTwoCounter);
+        // model.getSolver().printStatistics();
+        while( model.getSolver().solve()){
+           // long stopTime = System.currentTimeMillis();
+           // long elapsedTime = stopTime - startTime;
+          //  System.out.println(elapsedTime / 1000.0);
+            System.out.println("\n\nchecking if the solution found is valid!");
+            fillStudentSlots();
+            validateSolution();
+            calculateStats();
+            System.out.println("uni solution coming next");
+            System.out.println("number of students who have 4 exams in 2 days is:" + fourInTwoCounter);
+        }
+
 
 
         /*
@@ -290,11 +295,6 @@ public class TryingChoco1 {
             students.get(k).setExamsLen(leng);
             students.get(k).setFirstSlot(firstSlot);
             students.get(k).setLastSlot(LastSlot);
-            //System.out.println("lengeth of exam period is "+leng+" days");
-            int firstDay=((firstSlot-1)/3)+1;
-            int lastDay=((LastSlot-1)/3)+1;
-            //System.out.println("first exam is on day number "+firstDay);
-            //System.out.println("last exam is on day number "+lastDay);
 
 
     }
@@ -359,7 +359,7 @@ public class TryingChoco1 {
         int flag = 0;
         for (int i = 0; i < students.size(); i++) {
             //count the number of students who have 4 in 2
-            FourInTwo(students.get(i).getSlots());
+             FourInTwo(students.get(i).getSlots());
             if (!checkIfTwoSlotsSame(students.get(i).getSlots()) || !checkIfThreeSameDay(students.get(i).getSlots())) {
                 System.out.println(students.get(i).getSlots() + "  " + students.get(i).getId());
                 flag = 1;
