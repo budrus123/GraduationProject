@@ -157,6 +157,10 @@ public class TryingChoco1 {
             calculateStats();
             System.out.println("uni solution coming next");
             System.out.println("number of students who have 4 exams in 2 days is:" + fourInTwoCounter);
+
+            System.out.println("Number of slots in our solution is equal to number of slots of University solution : " + Validation.numberTimeSlots(students));  // el mafrod awal wahde true mesh false !!
+
+
         }
 
 
