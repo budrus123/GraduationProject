@@ -145,21 +145,32 @@ public class TryingChoco1 {
          */
 
         new UniversityData(students);
+        if(Validation.validateUniversitySolution(students))
+            System.out.println("University Solution is valid");
+        else
+            System.out.println("University Solution is not valid");
+
+
+        double maxMean = 0;
 
         // model.getSolver().printStatistics();
         while( model.getSolver().solve()){
            // long stopTime = System.currentTimeMillis();
            // long elapsedTime = stopTime - startTime;
           //  System.out.println(elapsedTime / 1000.0);
-            System.out.println("\n\nchecking if the solution found is valid!");
+//            System.out.println("\n\nchecking if the solution found is valid!");
             fillStudentSlots();
-            validateSolution();
-            calculateStats();
-            System.out.println("uni solution coming next");
-            System.out.println("number of students who have 4 exams in 2 days is:" + fourInTwoCounter);
+//            validateSolution();
+            double max = calculateStats();
+//            System.out.println("uni solution coming next");
+//            System.out.println("number of students who have 4 exams in 2 days is:" + fourInTwoCounter);
+//
+//            System.out.println("Number of slots in our solution is equal to number of slots of University solution : " + Validation.numberTimeSlots(students));  // el mafrod awal wahde true mesh false !!
 
-            System.out.println("Number of slots in our solution is equal to number of slots of University solution : " + Validation.numberTimeSlots(students));  // el mafrod awal wahde true mesh false !!
-
+            if(max > maxMean){
+                maxMean = max;
+                System.out.println("New max : " + maxMean);
+            }
 
         }
 
@@ -178,7 +189,7 @@ public class TryingChoco1 {
     }
 
     //################################################################################################################
-    public static void calculateStats() {
+    public static double calculateStats() {
         double avgSum=0;
         double varSum=0;
         int countHasExams=0;
@@ -196,8 +207,10 @@ public class TryingChoco1 {
             }
 
         }
-        System.out.println("average mean of the solution = "+(avgSum/countHasExams));
-        System.out.println("average variance of the solution = "+(varSum/countHasExams));
+//        System.out.println("average mean of the solution = "+(avgSum/countHasExams));
+//        System.out.println("average variance of the solution = "+(varSum/countHasExams));
+
+        return avgSum/countHasExams;
     }
     //################################################################################################################
 
@@ -364,7 +377,7 @@ public class TryingChoco1 {
         for (int i = 0; i < students.size(); i++) {
             //count the number of students who have 4 in 2
              FourInTwo(students.get(i).getSlots());
-            if (!checkIfTwoSlotsSame(students.get(i).getSlots()) || !checkIfThreeSameDay(students.get(i).getSlots())) {
+            if (!Helper_Functions.checkIfTwoSlotsSame(students.get(i).getSlots()) || !Helper_Functions.checkIfThreeSameDay(students.get(i).getSlots())) {
                 System.out.println(students.get(i).getSlots() + "  " + students.get(i).getId());
                 flag = 1;
 //                System.out.println(studentExams+"\n"+students.get(i).getId());
@@ -397,48 +410,6 @@ public class TryingChoco1 {
             }
 
         }
-    }
-    //################################################################################################################
-
-
-    //################################################################################################################
-    public static boolean checkIfThreeSameDay(ArrayList<Integer> slots) {
-        int[] input = new int[slots.size()];    // input array
-        for (int i = 0; i < slots.size(); i++) {
-            input[i] = slots.get(i);
-        }
-        int k = 3;
-        List<int[]> subsets = Helper_Functions.allCombination(input, k);
-        /*combo of all the time slots for a student
-        this is to see if any three exams or slots
-        are in the same day*/
-
-        for (int i = 0; i < subsets.size(); i++) {
-            if (Helper_Functions.haveSameDay(subsets.get(i)[0], subsets.get(i)[1]) &&
-                    Helper_Functions.haveSameDay(subsets.get(i)[0], subsets.get(i)[2])) {
-                return false;
-            }
-
-        }
-
-        return true;
-    }
-    //################################################################################################################
-
-
-    //################################################################################################################
-    public static boolean checkIfTwoSlotsSame(ArrayList<Integer> slots) {
-
-        for (int i = 0; i < slots.size(); i++) {
-            for (int k = i + 1; k < slots.size(); k++) {
-                if (slots.get(k) == slots.get(i)) {
-                    System.out.println(slots);
-                    return false;
-                }
-            }
-        }
-
-        return true;
     }
     //################################################################################################################
 

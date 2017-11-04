@@ -203,4 +203,43 @@ public class Helper_Functions {
         return query;
     }
 
+
+    public static boolean checkIfTwoSlotsSame(ArrayList<Integer> slots) {
+
+        for (int i = 0; i < slots.size(); i++) {
+            for (int k = i + 1; k < slots.size(); k++) {
+                if (slots.get(k) == slots.get(i)) {
+                    System.out.println(slots);
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public static boolean checkIfThreeSameDay(ArrayList<Integer> slots) {
+        int[] input = new int[slots.size()];    // input array
+        for (int i = 0; i < slots.size(); i++) {
+            input[i] = slots.get(i);
+        }
+        int k = 3;
+        List<int[]> subsets = Helper_Functions.allCombination(input, k);
+        /*combo of all the time slots for a student
+        this is to see if any three exams or slots
+        are in the same day*/
+
+        for (int i = 0; i < subsets.size(); i++) {
+            if (Helper_Functions.haveSameDay(subsets.get(i)[0], subsets.get(i)[1]) &&
+                    Helper_Functions.haveSameDay(subsets.get(i)[0], subsets.get(i)[2])) {
+                return false;
+            }
+
+        }
+
+        return true;
+    }
+
+
+
 }
