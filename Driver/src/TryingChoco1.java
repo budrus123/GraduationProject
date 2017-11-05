@@ -145,10 +145,10 @@ public class TryingChoco1 {
          */
 
         new UniversityData(students);
-        if(Validation.validateUniversitySolution(students))
-            System.out.println("University Solution is valid");
-        else
-            System.out.println("University Solution is not valid");
+//        if(Validation.validateUniversitySolution(students))
+//            System.out.println("University Solution is valid");
+//        else
+//            System.out.println("University Solution is not valid");
 
 
         double maxMean = 0;
@@ -171,6 +171,7 @@ public class TryingChoco1 {
                 maxMean = max;
                 System.out.println("New max : " + maxMean);
             }
+            model.getSolver().setRestartOnSolutions();
 
         }
 
