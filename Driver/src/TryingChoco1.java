@@ -15,6 +15,7 @@ import java.util.stream.IntStream;
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.Constraint;
+import org.chocosolver.solver.search.strategy.Search;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.util.tools.ArrayUtils;
 
@@ -35,6 +36,8 @@ public class TryingChoco1 {
     static ArrayList<IntVar> variables = new ArrayList<IntVar>();
     static ArrayList<Student> students = new ArrayList<Student>();
     static int constCounter = 0;
+    static int explored=0;
+    static double MaxAvg=0;
     //our connection
     static Connection connection;
 
@@ -145,21 +148,23 @@ public class TryingChoco1 {
          */
 
         new UniversityData(students);
+        IntVar[] varsArray= variables.toArray(new IntVar[variables.size()]);
 
         // model.getSolver().printStatistics();
         while( model.getSolver().solve()){
            // long stopTime = System.currentTimeMillis();
            // long elapsedTime = stopTime - startTime;
           //  System.out.println(elapsedTime / 1000.0);
-            System.out.println("\n\nchecking if the solution found is valid!");
-            fillStudentSlots();
-            validateSolution();
-            calculateStats();
-            System.out.println("uni solution coming next");
-            System.out.println("number of students who have 4 exams in 2 days is:" + fourInTwoCounter);
+            //System.out.println("\n\nchecking if the solution found is valid!");
+//            fillStudentSlots();
+//            validateSolution();
+//            calculateStats();
+            explored++;
+            System.out.println(explored);
+//            System.out.println("number of students who have 4 exams in 2 days is:" + fourInTwoCounter);
 
-            System.out.println("Number of slots in our solution is equal to number of slots of University solution : " + Validation.numberTimeSlots(students));  // el mafrod awal wahde true mesh false !!
-
+           // System.out.println("Number of slots in our solution is equal to number of slots of University solution : " + Validation.numberTimeSlots(students));  // el mafrod awal wahde true mesh false !!
+//             fourInTwoCounter=0;
 
         }
 
@@ -178,7 +183,7 @@ public class TryingChoco1 {
     }
 
     //################################################################################################################
-    public static void calculateStats() {
+    public static void calculateStats() throws SQLException {
         double avgSum=0;
         double varSum=0;
         int countHasExams=0;
@@ -196,8 +201,30 @@ public class TryingChoco1 {
             }
 
         }
-        System.out.println("average mean of the solution = "+(avgSum/countHasExams));
-        System.out.println("average variance of the solution = "+(varSum/countHasExams));
+        if((avgSum/countHasExams)>MaxAvg){
+            MaxAvg=(avgSum/countHasExams);
+            //int solution_id=1;
+            System.out.println("average mean of the solution = "+(avgSum/countHasExams));
+            System.out.println("average variance of the solution = "+(varSum/countHasExams));
+            System.out.println("number of students who have 4 exams in 2 days is:" + fourInTwoCounter);
+            System.out.println("number of solutions explored= " + explored);
+            System.out.println("\n\n");
+
+            int solution_id = 1;
+
+        /*inserting the solution
+        into the database
+         */
+        Statement stmt = connection.createStatement();
+        String query = "DELETE FROM solution";
+        stmt.executeUpdate(query);  // delete all records in solution.
+        String insertQuery = Helper_Functions.getSolutionQuery(solution_id++, variables, courseAL, "solution");
+        Statement stmt2 = connection.createStatement();
+        stmt2.executeUpdate(insertQuery);
+        /*
+        done inserting the solution
+         */
+        }
     }
     //################################################################################################################
 
@@ -370,10 +397,10 @@ public class TryingChoco1 {
 //                System.out.println(studentExams+"\n"+students.get(i).getId());
             }
         }
-        if (flag == 0)
-            System.out.println("***********solution is valid***********");
-        else
-            System.out.println("solution is not valid");
+//        if (flag == 0)
+//            System.out.println("***********solution is valid***********");
+//        else
+//            System.out.println("solution is not valid");
 
     }
     //################################################################################################################
@@ -559,6 +586,8 @@ public class TryingChoco1 {
             courseAL.get(Integer.valueOf(course_student2.getString("course_id")) - 1).addStudent(students.get(Integer.valueOf(course_student2.getString("STUDENT_NUMBER")) - 1));
             students.get((Integer.valueOf(course_student2.getString("STUDENT_NUMBER")) - 1)).addCourse(courseAL.get(Integer.valueOf(course_student2.getString("course_id")) - 1));
         }
+
+
 
 
     }
