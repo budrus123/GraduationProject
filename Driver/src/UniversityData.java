@@ -15,6 +15,7 @@ public class UniversityData {
             connection = DriverManager.getConnection(Constants.URL, Constants.USERNAME, Password.password);
             fillStudentObjects();
             calculateStatsU();
+            this.validateSolution();
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -117,9 +118,12 @@ public class UniversityData {
         double avgSum=0;
         double varSum=0;
         int countHasExams=0;
+        int b2bTotal=0;
+        int fourIn2total=0;
         for(int i=0;i<students.size();i++){
-            //System.out.println("\n***printing stats for student number "+ i+" ***");
 
+            b2bTotal+=TryingChoco1.b2b(students.get(i).getSlotsU());
+            fourIn2total+=TryingChoco1.FourInTwo(students.get(i).getSlotsU());
             if(students.get(i).getSlotsU().size()>0){
                 //students.get(i).printSlots();
                 calculateFullExamLengethU(students.get(i));
@@ -133,6 +137,10 @@ public class UniversityData {
         }
         System.out.println("average mean of the University solution = "+(avgSum/countHasExams));
         System.out.println("average variance of the University solution = "+(varSum/countHasExams));
+        System.out.println("back to back total uni = "+b2bTotal);
+        System.out.println("4 in 2 count  = "+fourIn2total);
+        System.out.println("\n\n");
+
     }
 
 
@@ -150,6 +158,28 @@ public class UniversityData {
             student.setSlotsU(student.getSlotsU());
         }
     }
+
+    public void validateSolution() {
+        int flag = 0;
+        int counterOfInvalid=0;
+        for (int i = 0; i < students.size(); i++) {
+            //count the number of students who have 4 in 2
+
+            if (!Helper_Functions.checkIfTwoSlotsSame(students.get(i).getSlotsU()) || !Helper_Functions.checkIfThreeSameDay(students.get(i).getSlotsU())) {
+                System.out.println(students.get(i).getSlotsU() + "  " + students.get(i).getId());
+                flag = 1;
+                counterOfInvalid++;
+//                System.out.println(studentExams+"\n"+students.get(i).getId());
+            }
+        }
+        if (flag == 0)
+            System.out.println("***********solution is valid***********");
+        else
+            System.out.println("solution is not valid, count of invalid: "+counterOfInvalid);
+
+    }
+
+
 
 
 }

@@ -7,16 +7,29 @@
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 import org.chocosolver.solver.Model;
+import org.chocosolver.solver.ParallelPortfolio;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.Constraint;
+import org.chocosolver.solver.search.strategy.Search;
+import org.chocosolver.solver.search.strategy.assignments.DecisionOperator;
+import org.chocosolver.solver.search.strategy.decision.Decision;
+import org.chocosolver.solver.search.strategy.decision.IntDecision;
+import org.chocosolver.solver.search.strategy.selectors.values.IntValueSelector;
+import org.chocosolver.solver.search.strategy.selectors.variables.VariableSelector;
+import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;
+import org.chocosolver.solver.search.strategy.strategy.IntStrategy;
 import org.chocosolver.solver.variables.IntVar;
+import org.chocosolver.util.PoolManager;
 import org.chocosolver.util.tools.ArrayUtils;
+
+import static org.chocosolver.solver.search.strategy.Search.intVarSearch;
 
 /**
  * @author Mahmoud
@@ -37,6 +50,7 @@ public class TryingChoco1 {
     static int constCounter = 0;
     //our connection
     static Connection connection;
+    static double maxMean = 0;
 
     public static void main(String[] args) throws SQLException {
         // TODO code application logic here
@@ -85,15 +99,15 @@ public class TryingChoco1 {
             Logger.getLogger(TryingChoco1.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        
-        
+
+
         /*
         first function is to fill the student array list 
         in each course so we know who takes each course
         course A now has an arraylist of students who take it
         */
         fillStudentTakesCourse();
-        
+
         
         /*
         this is to create the hard constraints
@@ -118,9 +132,29 @@ public class TryingChoco1 {
 //            }
         }
 
-        System.out.print("done with the combos " + constCounter);
+        System.out.println("done with the combos " + constCounter);
 
+        /*
+        to fill the interect factor
+         */
+        fillInterSectFactor();
 
+        Collections.sort(courseAL);
+//        model.setObjective(Model.MINIMIZE,variables.get(courseAL.get(0).getVariableIndex()));
+//        model.setObjective(Model.MAXIMIZE,variables.get(courseAL.get(1).getVariableIndex()));
+//        model.setObjective(Model.MINIMIZE,variables.get(courseAL.get(2).getVariableIndex()));
+//        model.setObjective(Model.MAXIMIZE,variables.get(courseAL.get(3).getVariableIndex()));
+//        model.setObjective(Model.MINIMIZE,variables.get(courseAL.get(4).getVariableIndex()));
+
+        //System.out.println(courseAL.size());
+        for (int i = 0; i < courseAL.size(); i++) {
+            System.out.println(courseAL.get(i).getIntersectFactor() + " " + courseAL.get(i).getLabel() + " var index is:" + courseAL.get(i).getVariableIndex());
+        }
+
+        for (int i = 0; i <10 ; i++) {
+
+            model.arithm(variables.get(courseAL.get(i).getVariableIndex()), "<", 12).post();
+        }
 
         /*
         if the model finds a solutin, print it
@@ -149,31 +183,94 @@ public class TryingChoco1 {
 //            System.out.println("University Solution is valid");
 //        else
 //            System.out.println("University Solution is not valid");
+        //mostCommonCourses();
 
+        //model.setPrecision(10);
 
-        double maxMean = 0;
 
         // model.getSolver().printStatistics();
-        while( model.getSolver().solve()){
-           // long stopTime = System.currentTimeMillis();
-           // long elapsedTime = stopTime - startTime;
-          //  System.out.println(elapsedTime / 1000.0);
+
+//        ParallelPortfolio portfolio = new ParallelPortfolio();
+//        int nbModels = 2;
+//        for(int s=0;s<nbModels;s++){
+//            portfolio.addModel(model);
+//        }
+//        portfolio.solve()
+        //model.setObjective(Model.MAXIMIZE, variables.get(0));
+        ;
+        IntVar[] varArr = variables.toArray(new IntVar[variables.size()]);
+
+        //model.getSolver().setSearch(Search.minDomLBSearch(varArr));
+        //public static IntStrategy intVarSearch(VariableSelector<IntVar> varSelector,IntValueSelector valSelector,IntVar... vars);
+//        model.getSolver().setSearch();
+//        (VariableSelector<IntVar>) varSel ->{
+//            for (int i = 0; i <variables.size() ; i++) {
+//
+//            }
+//            return 0;
+//        };
+
+//        model.getSolver().setSearch(intVarSearch(
+//                // variable selector
+//                (VariableSelector<IntVar>) variab -> {
+//                    for (Course o : courseAL) {
+//                        if (!o.isTaken() && o.getIntersectFactor()!=0) {
+//                            o.setIntersectFactor(0);
+//                            Collections.sort(courseAL);
+//                            System.out.println("assigning course "+o.getLabel());
+//                            return variables.get(o.getVariableIndex());
+//                        }
+//                    }
+//                    fillInterSectFactor();
+//                    for(Course j:courseAL)
+//                        j.setTaken(false);
+//                    return null;
+//                }, Search.minDomLBSearch(varArr).getValSelector()
+//        ));
+
+
+//        model.getSolver().setSearch(intVarSearch(
+//                // variable selector
+//                (VariableSelector<IntVar>) variables -> {
+//                    for (IntVar v : variables) {
+//                        if (!v.isInstantiated()) {
+//                            return v;
+//                        }
+//                    }
+//                    return null;
+//                },
+//                Search.minDomLBSearch(varArr).getValSelector()
+//        ));
+
+        int i = 0;
+        while (model.getSolver().solve()) {
+            //System.out.println("max depth is "+ model.getSolver().getMaxDepth());
+//            model.setObjective(Model.MAXIMIZE, variables.get(i++ % 1000));
+//            model.setObjective(Model.MINIMIZE, variables.get(i % 1000));
+            //model.getSolver().solve();
+            fourInTwoCounter = 0;
+            // long stopTime = System.currentTimeMillis();
+            // long elapsedTime = stopTime - startTime;
+            //  System.out.println(elapsedTime / 1000.0);
 //            System.out.println("\n\nchecking if the solution found is valid!");
             fillStudentSlots();
-//            validateSolution();
-            double max = calculateStats();
-//            System.out.println("uni solution coming next");
-//            System.out.println("number of students who have 4 exams in 2 days is:" + fourInTwoCounter);
+            //validateSolution();
+            calculateStats();
+            //System.out.println("uni solution coming next");
+            //System.out.println("number of students who have 4 exams in 2 days is:" + fourInTwoCounter);
 //
 //            System.out.println("Number of slots in our solution is equal to number of slots of University solution : " + Validation.numberTimeSlots(students));  // el mafrod awal wahde true mesh false !!
 
-            if(max > maxMean){
-                maxMean = max;
-                System.out.println("New max : " + maxMean);
-            }
+//            if (max > maxMean) {
+//                maxMean = max;
+//                System.out.println("New max : " + maxMean);
+//            }
             model.getSolver().setRestartOnSolutions();
 
         }
+
+
+        // }
 
 
 
@@ -189,79 +286,174 @@ public class TryingChoco1 {
          */
     }
 
-    //################################################################################################################
-    public static double calculateStats() {
-        double avgSum=0;
-        double varSum=0;
-        int countHasExams=0;
-        for(int i=0;i<students.size();i++){
-            //System.out.println("\n***printing stats for student number "+ i+" ***");
+    public static void fillInterSectFactor() {
+        int fact = 0;
+        for (int i = 0; i < courseAL.size(); i++) {
+            for (int j = 0; j < courseAL.size(); j++) {
+                if (getCommonCount(courseAL.get(i).getAl(), courseAL.get(j).getAl()) > 0) {
+                    fact++;
+                }
 
-            if(students.get(i).getSlots().size()>0){
+            }
+            courseAL.get(i).setIntersectFactor(fact);
+            //System.out.println(courseAL.get(i).getLabel()+" factor of "+fact);
+            fact = 0;
+
+        }
+    }
+
+    //################################################################################################################
+    public static void mostCommonCourses() {
+
+        for (int i = 0; i < courseAL.size(); i++) {
+            for (int j = i + 1; j < courseAL.size(); j++) {
+                ArrayList<Student> st1 = courseAL.get(i).getAl();
+                ArrayList<Student> st2 = courseAL.get(j).getAl();
+                int commonCount = getCommonCount(st1, st2);
+                if (commonCount > 200) {
+                    System.out.println(courseAL.get(i).getLabel() + ", " + courseAL.get(j).getLabel() + " count is " + commonCount);
+
+                    model.setObjective(Model.MAXIMIZE, variables.get(courseAL.get(i).getVariableIndex()));
+                    model.setObjective(Model.MINIMIZE, variables.get(courseAL.get(j).getVariableIndex()));
+                }
+//                if (commonCount == 0) {
+//                    model.setObjective(Model.MINIMIZE, variables.get(courseAL.get(i).getVariableIndex()));
+//                    model.setObjective(Model.MAXIMIZE, variables.get(courseAL.get(j).getVariableIndex()));
+//                }
+            }
+
+        }
+
+    }
+
+    //################################################################################################################
+
+
+    //################################################################################################################
+    public static int getCommonCount(ArrayList<Student> st1, ArrayList<Student> st2) {
+        int sum = 0;
+        for (int i = 0; i < st1.size(); i++) {
+            for (int j = 0; j < st2.size(); j++) {
+                if (st1.get(i).getId() == st2.get(j).getId()) {
+                    sum++;
+                }
+
+            }
+        }
+        return sum;
+    }
+    //################################################################################################################
+
+
+    //################################################################################################################
+    public static void calculateStats() {
+        double avgSum = 0;
+        double varSum = 0;
+        int countHasExams = 0;
+        int b2bTotal = 0;
+        int fourin2total = 0;
+        for (int i = 0; i < students.size(); i++) {
+            //System.out.println("uni= "+students.get(i).getSlotsU());
+            //System.out.println("us= "+students.get(i).getSlots());
+            //System.out.println("\n***printing stats for student number "+ i+" ***");
+            fourin2total += FourInTwo(students.get(i).getSlots());
+            b2bTotal += b2b(students.get(i).getSlots());
+            if (students.get(i).getSlots().size() > 0) {
                 //students.get(i).printSlots();
-                calculateFullExamLengeth(students.get(i),i);
-                avgSum+=calculateAvgDaysBetweenExams(students.get(i),i);
-                varSum+=calculateVarianceOfSpace(students.get(i),i);
+                calculateFullExamLengeth(students.get(i), i);
+                avgSum += calculateAvgDaysBetweenExams(students.get(i), i);
+                varSum += calculateVarianceOfSpace(students.get(i), i);
 
                 //System.out.println(" ");
                 countHasExams++;
             }
 
         }
-//        System.out.println("average mean of the solution = "+(avgSum/countHasExams));
-//        System.out.println("average variance of the solution = "+(varSum/countHasExams));
+        double max = avgSum / countHasExams;
+        if (max > maxMean) {
+            maxMean = max;
+            System.out.println("New max : " + maxMean);
+            System.out.println("average mean of the solution = " + (avgSum / countHasExams));
+            System.out.println("average variance of the solution = " + (varSum / countHasExams));
+            System.out.println("back to back count is: " + b2bTotal);
+            System.out.println("4 in 2 count is: " + fourin2total);
 
-        return avgSum/countHasExams;
+            for (int j = 0; j < variables.size(); j++) {
+                System.out.println(variables.get(j)+"\tvar index"+j);
+            }
+        }
+
+
+        //return avgSum / countHasExams;
     }
+
     //################################################################################################################
+    public static int b2b(ArrayList<Integer> slots) {
+        Collections.sort(slots);
+        int sum = 0;
+        for (int i = 0; i < slots.size(); i++) {
+            if (i == 0)
+                continue;
+            else {
+                if (Math.abs(slots.get(i) - slots.get(i - 1)) <= 1) {
+                    sum += 1;
+                }
+                //print(abs(list[index]-list[index-1]))
+
+            }
+        }
+//        if(sum>0){
+//            System.out.println("b2b bro += "+sum+"\n\n"); //7 8 9 10 11 12
+//        }
+        return sum;
+    }
 
 
     //################################################################################################################
-    public static double calculateVarianceOfSpace(Student stu,int q) {
-        int [][] s2D = stu.getSlots2D();
-        double sum=0;
-        int count=0;
-        for(int i=(stu.getFirstSlot()-1)/3;i<(((stu.getLastSlot()-1)/3)+1);i++){
+    public static double calculateVarianceOfSpace(Student stu, int q) {
+        int[][] s2D = stu.getSlots2D();
+        double sum = 0;
+        int count = 0;
+        for (int i = (stu.getFirstSlot() - 1) / 3; i < (((stu.getLastSlot() - 1) / 3) + 1); i++) {
             //System.out.println("i is -> "+i);
-            if(i==(stu.getFirstSlot()-1)/3){
+            if (i == (stu.getFirstSlot() - 1) / 3) {
                 continue;
             }
-            if((s2D[i][0]==0)&&(s2D[i][1]==0)&&(s2D[i][2]==0)){
+            if ((s2D[i][0] == 0) && (s2D[i][1] == 0) && (s2D[i][2] == 0)) {
                 count++;
             }
-            if((s2D[i][0]==1)||(s2D[i][1]==1)||(s2D[i][2]==1)){
+            if ((s2D[i][0] == 1) || (s2D[i][1] == 1) || (s2D[i][2] == 1)) {
                 if (s2D[i][0] == 1) {
-                    sum+=Math.pow((double)count-stu.getAvgDaysBetweenExams(),2);
+                    sum += Math.pow((double) count - stu.getAvgDaysBetweenExams(), 2);
                     //System.out.println("added power -> "+Math.pow((double)count-stu.getAvgDaysBetweenExams(),2));
-                    count=0;
+                    count = 0;
                 }
-                 if (s2D[i][1] ==1) {
-                    sum+=Math.pow((double)count-stu.getAvgDaysBetweenExams(),2);
+                if (s2D[i][1] == 1) {
+                    sum += Math.pow((double) count - stu.getAvgDaysBetweenExams(), 2);
                     //System.out.println("added power -> "+Math.pow((double)count-stu.getAvgDaysBetweenExams(),2));
 
-                    count=0;
+                    count = 0;
                 }
-                 if (s2D[i][2] == 1){
-                    sum+=Math.pow((double)count-stu.getAvgDaysBetweenExams(),2);
+                if (s2D[i][2] == 1) {
+                    sum += Math.pow((double) count - stu.getAvgDaysBetweenExams(), 2);
                     //System.out.println("added power -> "+Math.pow((double)count-stu.getAvgDaysBetweenExams(),2));
 
-                    count=0;
+                    count = 0;
                 }
 
             }
 
 
         }
-        int m=(stu.getFirstSlot()-1)/3;
-        int numofExamsFirstDay=s2D[m][0]+s2D[m][1]+s2D[m][2];
+        int m = (stu.getFirstSlot() - 1) / 3;
+        int numofExamsFirstDay = s2D[m][0] + s2D[m][1] + s2D[m][2];
         //System.out.println("num in fDay -> "+numofExamsFirstDay);
-        double var=sum/((double)stu.getSlots().size() - numofExamsFirstDay-1);
-        if(Double.isNaN(var)){
+        double var = sum / ((double) stu.getSlots().size() - numofExamsFirstDay - 1);
+        if (Double.isNaN(var)) {
             students.get(q).setVarianceOfSpaces(0);
 
-        }
-        else{
-            students.get(q).setVarianceOfSpaces(sum/((double)stu.getSlots().size() - numofExamsFirstDay-1));
+        } else {
+            students.get(q).setVarianceOfSpaces(sum / ((double) stu.getSlots().size() - numofExamsFirstDay - 1));
         }
 
         //System.out.println("Variance of number of days between exams is "+students.get(q).getVarianceOfSpaces()+" days");
@@ -271,54 +463,47 @@ public class TryingChoco1 {
     //################################################################################################################
 
 
-
     //################################################################################################################
-    public static double calculateAvgDaysBetweenExams(Student stu,int q) {
-       int [][] s2D = stu.getSlots2D();
-       int count=0;
-       for(int i=(stu.getFirstSlot()-1)/3;i<(stu.getLastSlot()-1)/3;i++){
-           if((s2D[i][0]==0)&&(s2D[i][1]==0)&&(s2D[i][2]==0)){
-               count++;
-           }
+    public static double calculateAvgDaysBetweenExams(Student stu, int q) {
+        int[][] s2D = stu.getSlots2D();
+        int count = 0;
+        for (int i = (stu.getFirstSlot() - 1) / 3; i < (stu.getLastSlot() - 1) / 3; i++) {
+            if ((s2D[i][0] == 0) && (s2D[i][1] == 0) && (s2D[i][2] == 0)) {
+                count++;
+            }
 
-       }
-        int m=(stu.getFirstSlot()-1)/3;
-        int numofExamsFirstDay=s2D[m][0]+s2D[m][1]+s2D[m][2];
-        double avg=(count)/((double)stu.getSlots().size() - numofExamsFirstDay);
-        if(Double.isNaN(avg)){
-            students.get(q).setAvgDaysBetweenExams(0);
         }
-        else{
+        int m = (stu.getFirstSlot() - 1) / 3;
+        int numofExamsFirstDay = s2D[m][0] + s2D[m][1] + s2D[m][2];
+        double avg = (count) / ((double) stu.getSlots().size() - numofExamsFirstDay);
+        if (Double.isNaN(avg)) {
+            students.get(q).setAvgDaysBetweenExams(0);
+        } else {
             students.get(q).setAvgDaysBetweenExams(avg);
         }
-       // System.out.println("Average number of days between exams is "+(count)/((double)stu.getSlots().size()-1)+" days");
+        // System.out.println("Average number of days between exams is "+(count)/((double)stu.getSlots().size()-1)+" days");
         return students.get(q).getAvgDaysBetweenExams();
     }
     //################################################################################################################
 
 
-
-
-
     //################################################################################################################
-    public static void calculateFullExamLengeth(Student stu,int k) {
-        int firstSlot,LastSlot;
+    public static void calculateFullExamLengeth(Student stu, int k) {
+        int firstSlot, LastSlot;
         //Integer [] stuSlots=Arrays.sort((Integer [])stu.getSlots().toArray());
 
-            int[] stuSlots=stu.getSlots().stream().mapToInt(i->i).toArray(); //array list to array
-            Arrays.sort(stuSlots);
-            firstSlot=stuSlots[0];
-            LastSlot=stuSlots[stuSlots.length-1];
-            int leng= (((LastSlot -1)/3) - ((firstSlot -1)/3)) +1;
-            students.get(k).setExamsLen(leng);
-            students.get(k).setFirstSlot(firstSlot);
-            students.get(k).setLastSlot(LastSlot);
+        int[] stuSlots = stu.getSlots().stream().mapToInt(i -> i).toArray(); //array list to array
+        Arrays.sort(stuSlots);
+        firstSlot = stuSlots[0];
+        LastSlot = stuSlots[stuSlots.length - 1];
+        int leng = (((LastSlot - 1) / 3) - ((firstSlot - 1) / 3)) + 1;
+        students.get(k).setExamsLen(leng);
+        students.get(k).setFirstSlot(firstSlot);
+        students.get(k).setLastSlot(LastSlot);
 
 
     }
     //################################################################################################################
-
-
 
 
     //################################################################################################################
@@ -377,9 +562,9 @@ public class TryingChoco1 {
         int flag = 0;
         for (int i = 0; i < students.size(); i++) {
             //count the number of students who have 4 in 2
-             FourInTwo(students.get(i).getSlots());
+
             if (!Helper_Functions.checkIfTwoSlotsSame(students.get(i).getSlots()) || !Helper_Functions.checkIfThreeSameDay(students.get(i).getSlots())) {
-                System.out.println(students.get(i).getSlots() + "  " + students.get(i).getId());
+                //System.out.println(students.get(i).getSlots() + "  " + students.get(i).getId());
                 flag = 1;
 //                System.out.println(studentExams+"\n"+students.get(i).getId());
             }
@@ -394,7 +579,7 @@ public class TryingChoco1 {
 
 
     //################################################################################################################
-    public static void FourInTwo(ArrayList<Integer> slots) {
+    public static int FourInTwo(ArrayList<Integer> slots) {
         int[] input = new int[slots.size()];    // input array
         for (int i = 0; i < slots.size(); i++) {
             input[i] = slots.get(i);
@@ -404,13 +589,19 @@ public class TryingChoco1 {
         /*combo of all the time slots for a student
         this is to see if any three exams or slots
         are in the same day*/
+        int sum = 0;
 
         for (int i = 0; i < subsets.size(); i++) {
             if (Helper_Functions.fourInTwo(subsets.get(i))) {
-                fourInTwoCounter++;
+                sum++;
+//                System.out.println(Arrays.toString(subsets.get(i)));
             }
 
         }
+//        if(sum>0){
+//            System.out.println("four int two bro += "+sum);
+//        }
+        return sum;
     }
     //################################################################################################################
 

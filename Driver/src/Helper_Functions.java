@@ -112,9 +112,15 @@ public class Helper_Functions {
         int min=arr[0];
         int max=arr[3];
 
-        if((Math.abs((Math.ceil(max/3))-(Math.ceil(min/3)))) >= 2 )
-            return false;
+        if((Math.abs((Math.ceil(max/3.0))-(Math.ceil(min/3.0)))) >= 2 )
+        {
 
+            return false;
+        }
+
+//        System.out.println("min is "+min+" max is "+max);
+//        System.out.println((Math.ceil(max/3)));
+//        System.out.println((Math.ceil(min/3)));
         return  true;
 
     }
