@@ -10,6 +10,11 @@ public class Validation {
         for(Student student: students){
             numberOfSlots+=student.getSlots().size();
             numberOfUniversitySlots+=student.getSlotsU().size();
+            if(student.getSlots().size()!=student.getSlotsU().size()){
+                System.out.println(student.getSlots());
+                System.out.println(student.getSlotsU());
+
+            }
         }
         return numberOfSlots == numberOfUniversitySlots;
     }

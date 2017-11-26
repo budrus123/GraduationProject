@@ -151,10 +151,39 @@ public class TryingChoco1 {
             System.out.println(courseAL.get(i).getIntersectFactor() + " " + courseAL.get(i).getLabel() + " var index is:" + courseAL.get(i).getVariableIndex());
         }
 
-        for (int i = 0; i <10 ; i++) {
+        //for (int i = 0; i <10 ; i++) {
 
-            model.arithm(variables.get(courseAL.get(i).getVariableIndex()), "<", 12).post();
-        }
+            model.arithm(variables.get(courseAL.get(0).getVariableIndex()), "<", 3).post();
+
+        model.arithm(variables.get(courseAL.get(1).getVariableIndex()), ">", 3).post();
+        model.arithm(variables.get(courseAL.get(1).getVariableIndex()), "<", 6).post();
+
+        model.arithm(variables.get(courseAL.get(2).getVariableIndex()), ">", 6).post();
+        model.arithm(variables.get(courseAL.get(2).getVariableIndex()), "<", 9).post();
+
+        model.arithm(variables.get(courseAL.get(3).getVariableIndex()), ">", 9).post();
+        model.arithm(variables.get(courseAL.get(3).getVariableIndex()), "<", 12).post();
+
+        model.arithm(variables.get(courseAL.get(4).getVariableIndex()), ">", 12).post();
+        model.arithm(variables.get(courseAL.get(4).getVariableIndex()), "<", 15).post();
+
+        model.arithm(variables.get(courseAL.get(5).getVariableIndex()), ">", 15).post();
+        model.arithm(variables.get(courseAL.get(5).getVariableIndex()), "<", 18).post();
+
+        model.arithm(variables.get(courseAL.get(6).getVariableIndex()), ">", 18).post();
+        model.arithm(variables.get(courseAL.get(6).getVariableIndex()), "<", 21).post();
+
+        model.arithm(variables.get(courseAL.get(7).getVariableIndex()), ">", 21).post();
+        model.arithm(variables.get(courseAL.get(7).getVariableIndex()), "<", 24).post();
+
+        model.arithm(variables.get(courseAL.get(8).getVariableIndex()), ">", 24).post();
+        model.arithm(variables.get(courseAL.get(8).getVariableIndex()), "<", 27).post();
+
+        model.arithm(variables.get(courseAL.get(9).getVariableIndex()), ">", 27).post();
+        model.arithm(variables.get(courseAL.get(9).getVariableIndex()), "<", 30).post();
+
+
+        // }
 
         /*
         if the model finds a solutin, print it
@@ -259,12 +288,15 @@ public class TryingChoco1 {
             //System.out.println("uni solution coming next");
             //System.out.println("number of students who have 4 exams in 2 days is:" + fourInTwoCounter);
 //
-//            System.out.println("Number of slots in our solution is equal to number of slots of University solution : " + Validation.numberTimeSlots(students));  // el mafrod awal wahde true mesh false !!
+           //System.out.println("Number of slots in our solution is equal to number of slots of University solution : " + Validation.numberTimeSlots(students));  // el mafrod awal wahde true mesh false !!
 
 //            if (max > maxMean) {
 //                maxMean = max;
 //                System.out.println("New max : " + maxMean);
 //            }
+//            int sumUs=0;
+//            int sumUni=0;
+
             model.getSolver().setRestartOnSolutions();
 
         }
@@ -310,11 +342,13 @@ public class TryingChoco1 {
                 ArrayList<Student> st1 = courseAL.get(i).getAl();
                 ArrayList<Student> st2 = courseAL.get(j).getAl();
                 int commonCount = getCommonCount(st1, st2);
-                if (commonCount > 200) {
+                if (commonCount > 300) {
                     System.out.println(courseAL.get(i).getLabel() + ", " + courseAL.get(j).getLabel() + " count is " + commonCount);
 
-                    model.setObjective(Model.MAXIMIZE, variables.get(courseAL.get(i).getVariableIndex()));
-                    model.setObjective(Model.MINIMIZE, variables.get(courseAL.get(j).getVariableIndex()));
+//                    model.setObjective(Model.MAXIMIZE, variables.get(courseAL.get(i).getVariableIndex()));
+//                    model.setObjective(Model.MINIMIZE, variables.get(courseAL.get(j).getVariableIndex()));
+
+
                 }
 //                if (commonCount == 0) {
 //                    model.setObjective(Model.MINIMIZE, variables.get(courseAL.get(i).getVariableIndex()));
@@ -369,6 +403,10 @@ public class TryingChoco1 {
             }
 
         }
+
+        if(fourin2total<200){
+            System.out.println("4 in 2 count is: "+fourin2total);
+        }
         double max = avgSum / countHasExams;
         if (max > maxMean) {
             maxMean = max;
@@ -378,9 +416,9 @@ public class TryingChoco1 {
             System.out.println("back to back count is: " + b2bTotal);
             System.out.println("4 in 2 count is: " + fourin2total);
 
-            for (int j = 0; j < variables.size(); j++) {
-                System.out.println(variables.get(j)+"\tvar index"+j);
-            }
+//            for (int j = 0; j < variables.size(); j++) {
+//                System.out.println(variables.get(j)+"\tvar index"+j);
+//            }
         }
 
 
