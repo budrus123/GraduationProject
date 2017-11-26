@@ -5,10 +5,7 @@
  */
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
@@ -29,6 +26,7 @@ import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.util.PoolManager;
 import org.chocosolver.util.tools.ArrayUtils;
 
+import static org.chocosolver.solver.search.strategy.Search.activityBasedSearch;
 import static org.chocosolver.solver.search.strategy.Search.intVarSearch;
 
 /**
@@ -151,39 +149,6 @@ public class TryingChoco1 {
             System.out.println(courseAL.get(i).getIntersectFactor() + " " + courseAL.get(i).getLabel() + " var index is:" + courseAL.get(i).getVariableIndex());
         }
 
-        //for (int i = 0; i <10 ; i++) {
-
-            model.arithm(variables.get(courseAL.get(0).getVariableIndex()), "<", 3).post();
-
-        model.arithm(variables.get(courseAL.get(1).getVariableIndex()), ">", 3).post();
-        model.arithm(variables.get(courseAL.get(1).getVariableIndex()), "<", 6).post();
-
-        model.arithm(variables.get(courseAL.get(2).getVariableIndex()), ">", 6).post();
-        model.arithm(variables.get(courseAL.get(2).getVariableIndex()), "<", 9).post();
-
-        model.arithm(variables.get(courseAL.get(3).getVariableIndex()), ">", 9).post();
-        model.arithm(variables.get(courseAL.get(3).getVariableIndex()), "<", 12).post();
-
-        model.arithm(variables.get(courseAL.get(4).getVariableIndex()), ">", 12).post();
-        model.arithm(variables.get(courseAL.get(4).getVariableIndex()), "<", 15).post();
-
-        model.arithm(variables.get(courseAL.get(5).getVariableIndex()), ">", 15).post();
-        model.arithm(variables.get(courseAL.get(5).getVariableIndex()), "<", 18).post();
-
-        model.arithm(variables.get(courseAL.get(6).getVariableIndex()), ">", 18).post();
-        model.arithm(variables.get(courseAL.get(6).getVariableIndex()), "<", 21).post();
-
-        model.arithm(variables.get(courseAL.get(7).getVariableIndex()), ">", 21).post();
-        model.arithm(variables.get(courseAL.get(7).getVariableIndex()), "<", 24).post();
-
-        model.arithm(variables.get(courseAL.get(8).getVariableIndex()), ">", 24).post();
-        model.arithm(variables.get(courseAL.get(8).getVariableIndex()), "<", 27).post();
-
-        model.arithm(variables.get(courseAL.get(9).getVariableIndex()), ">", 27).post();
-        model.arithm(variables.get(courseAL.get(9).getVariableIndex()), "<", 30).post();
-
-
-        // }
 
         /*
         if the model finds a solutin, print it
@@ -258,48 +223,73 @@ public class TryingChoco1 {
 //        ));
 
 
+        Collections.sort(courseAL, new Comparator<Course>() {
+            @Override
+            public int compare(Course o1, Course o2) {
+                if(o1.getAl().size() < o2.getAl().size()){
+                    return 1;
+                }
+                else{
+                    return -1;
+                }
+            }
+        });
+
+
 //        model.getSolver().setSearch(intVarSearch(
 //                // variable selector
-//                (VariableSelector<IntVar>) variables -> {
-//                    for (IntVar v : variables) {
+//                (VariableSelector<IntVar>) varia -> {
+//                    for (Course course : courseAL) {
+//                        IntVar v = variables.get(course.getVariableIndex());
 //                        if (!v.isInstantiated()) {
 //                            return v;
 //                        }
 //                    }
 //                    return null;
 //                },
-//                Search.minDomLBSearch(varArr).getValSelector()
+//                (IntValueSelector) var -> var.getLB(),
+//                varArr
+//
 //        ));
 
-        int i = 0;
-        while (model.getSolver().solve()) {
-            //System.out.println("max depth is "+ model.getSolver().getMaxDepth());
-//            model.setObjective(Model.MAXIMIZE, variables.get(i++ % 1000));
-//            model.setObjective(Model.MINIMIZE, variables.get(i % 1000));
-            //model.getSolver().solve();
-            fourInTwoCounter = 0;
-            // long stopTime = System.currentTimeMillis();
-            // long elapsedTime = stopTime - startTime;
-            //  System.out.println(elapsedTime / 1000.0);
-//            System.out.println("\n\nchecking if the solution found is valid!");
+        Solver s = model.getSolver();
+        s.setSearch(activityBasedSearch(varArr));
+        while (s.solve()) {
             fillStudentSlots();
-            //validateSolution();
+            validateSolution();
             calculateStats();
-            //System.out.println("uni solution coming next");
-            //System.out.println("number of students who have 4 exams in 2 days is:" + fourInTwoCounter);
-//
-           //System.out.println("Number of slots in our solution is equal to number of slots of University solution : " + Validation.numberTimeSlots(students));  // el mafrod awal wahde true mesh false !!
-
-//            if (max > maxMean) {
-//                maxMean = max;
-//                System.out.println("New max : " + maxMean);
-//            }
-//            int sumUs=0;
-//            int sumUni=0;
-
             model.getSolver().setRestartOnSolutions();
-
         }
+
+        int i = 0;
+//        while (model.getSolver().solve()) {
+//            //System.out.println("max depth is "+ model.getSolver().getMaxDepth());
+////            model.setObjective(Model.MAXIMIZE, variables.get(i++ % 1000));
+////            model.setObjective(Model.MINIMIZE, variables.get(i % 1000));
+//            //model.getSolver().solve();
+//            fourInTwoCounter = 0;
+//            // long stopTime = System.currentTimeMillis();
+//            // long elapsedTime = stopTime - startTime;
+//            //  System.out.println(elapsedTime / 1000.0);
+////            System.out.println("\n\nchecking if the solution found is valid!");
+//            fillStudentSlots();
+//            //validateSolution();
+//            calculateStats();
+//            //System.out.println("uni solution coming next");
+//            //System.out.println("number of students who have 4 exams in 2 days is:" + fourInTwoCounter);
+////
+//           //System.out.println("Number of slots in our solution is equal to number of slots of University solution : " + Validation.numberTimeSlots(students));  // el mafrod awal wahde true mesh false !!
+//
+////            if (max > maxMean) {
+////                maxMean = max;
+////                System.out.println("New max : " + maxMean);
+////            }
+////            int sumUs=0;
+////            int sumUni=0;
+//
+//            model.getSolver().setRestartOnSolutions();
+//
+//        }
 
 
         // }
