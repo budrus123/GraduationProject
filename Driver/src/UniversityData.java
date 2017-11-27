@@ -122,8 +122,8 @@ public class UniversityData {
         int fourIn2total=0;
         for(int i=0;i<students.size();i++){
 
-            b2bTotal+=TryingChoco1.b2b(students.get(i).getSlotsU());
-            fourIn2total+=TryingChoco1.FourInTwo(students.get(i).getSlotsU());
+            b2bTotal+=StatCalculationFunctions.b2b(students.get(i).getSlotsU());
+            fourIn2total+=StatCalculationFunctions.FourInTwo(students.get(i).getSlotsU());
             if(students.get(i).getSlotsU().size()>0){
                 //students.get(i).printSlots();
                 calculateFullExamLengethU(students.get(i));

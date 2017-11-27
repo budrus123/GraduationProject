@@ -2,10 +2,13 @@ import org.chocosolver.solver.variables.IntVar;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class Helper_Functions {
 
@@ -210,6 +213,78 @@ public class Helper_Functions {
     }
 
 
+
+    public static void fillInterSectFactor() {
+        int fact = 0;
+        for (int i = 0; i < TryingChoco1.courseAL.size(); i++) {
+            for (int j = 0; j < TryingChoco1.courseAL.size(); j++) {
+                if (getCommonCount(TryingChoco1.courseAL.get(i).getAl(), TryingChoco1.courseAL.get(j).getAl()) > 0) {
+                    fact++;
+                }
+
+            }
+            TryingChoco1.courseAL.get(i).setIntersectFactor(fact);
+            //System.out.println(courseAL.get(i).getLabel()+" factor of "+fact);
+            fact = 0;
+
+        }
+    }
+
+    public static int getCommonCount(ArrayList<Student> st1, ArrayList<Student> st2) {
+        int sum = 0;
+        for (int i = 0; i < st1.size(); i++) {
+            for (int j = 0; j < st2.size(); j++) {
+                if (st1.get(i).getId() == st2.get(j).getId()) {
+                    sum++;
+                }
+
+            }
+        }
+        return sum;
+    }
+
+    public static void mostCommonCourses() {
+
+        for (int i = 0; i < TryingChoco1.courseAL.size(); i++) {
+            for (int j = i + 1; j < TryingChoco1.courseAL.size(); j++) {
+                ArrayList<Student> st1 = TryingChoco1.courseAL.get(i).getAl();
+                ArrayList<Student> st2 = TryingChoco1.courseAL.get(j).getAl();
+                int commonCount = getCommonCount(st1, st2);
+                if (commonCount > 300) {
+                    System.out.println(TryingChoco1.courseAL.get(i).getLabel() + ", " + TryingChoco1.courseAL.get(j).getLabel() + " count is " + commonCount);
+
+//                    model.setObjective(Model.MAXIMIZE, variables.get(courseAL.get(i).getVariableIndex()));
+//                    model.setObjective(Model.MINIMIZE, variables.get(courseAL.get(j).getVariableIndex()));
+
+
+                }
+//                if (commonCount == 0) {
+//                    model.setObjective(Model.MINIMIZE, variables.get(courseAL.get(i).getVariableIndex()));
+//                    model.setObjective(Model.MAXIMIZE, variables.get(courseAL.get(j).getVariableIndex()));
+//                }
+            }
+
+        }
+
+    }
+
+
+
+    public static void fillStudentSlots() {
+        int flag = 0;
+
+        for (int i = 0; i < TryingChoco1.students.size(); i++) {
+            ArrayList<Integer> studentExams = new ArrayList<Integer>();
+            for (int k = 0; k < TryingChoco1.students.get(i).getCourses().size(); k++) {
+                Course cid = (Course) TryingChoco1.students.get(i).getCourses().get(k);
+                studentExams.add(TryingChoco1.variables.get(cid.getVariableIndex()).getValue());
+                //student exams has the timeslots the student has exams in
+            }
+            TryingChoco1.students.get(i).setSlots(studentExams);
+
+        }
+    }
+
     public static boolean checkIfTwoSlotsSame(ArrayList<Integer> slots) {
 
         for (int i = 0; i < slots.size(); i++) {
@@ -244,6 +319,84 @@ public class Helper_Functions {
         }
 
         return true;
+    }
+
+
+    //################################################################################################################
+    public static void fillStudentTakesCourse() throws SQLException {
+
+        Statement stmt2 = TryingChoco1.connection.createStatement();
+        //String s="SELECT * FROM student_course_table where COURSE_LABEL='"+courseAL.get(i).getLabel()+"'";
+        ResultSet course_student2 = stmt2.executeQuery("SELECT * FROM student_course_table");
+        while (course_student2.next()) {
+            TryingChoco1.courseAL.get(Integer.valueOf(course_student2.getString("course_id")) - 1).addStudent(TryingChoco1.students.get(Integer.valueOf(course_student2.getString("STUDENT_NUMBER")) - 1));
+            TryingChoco1.students.get((Integer.valueOf(course_student2.getString("STUDENT_NUMBER")) - 1)).addCourse(TryingChoco1.courseAL.get(Integer.valueOf(course_student2.getString("course_id")) - 1));
+        }
+
+
+    }
+    //################################################################################################################
+
+
+    //################################################################################################################
+    public static IntVar getCourseIntVar(Course c) {
+
+        for (int i = 0; i < TryingChoco1.model.getNbVars(); i++) {
+            if (c.getLabel().equals(TryingChoco1.model.getVar(i).getName())) {
+                return (IntVar) TryingChoco1.model.getVar(i);
+            }
+        }
+        return null;
+    }
+    //################################################################################################################
+
+
+    //################################################################################################################
+    public static boolean haveCommonStudents(Course c1, Course c2) {
+        ArrayList<Student> a1 = new ArrayList<Student>();
+        ArrayList<Student> a2 = new ArrayList<Student>();
+
+
+        a1 = c1.getAl();
+        a2 = c2.getAl();
+
+        for (int j = 0; j < a2.size(); j++) {
+            if (a1.contains(a2.get(j))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public static int eval1(ArrayList<int[]> days) { //scoring same as s7s old function
+        int score = 0;
+        int size = days.size();
+        int dayInc = 0;
+        int flag = 0;
+        for (int i = days.size() - 1; i >= 0; i--) {
+            if (Arrays.asList(days.get(i)).contains(1)) { //check if we have exam that day
+                dayInc = 1;
+                if (IntStream.of(days.get(i)).sum() > 1) {
+                    flag = 1;
+                } else {
+                    flag = 0;
+                }
+                //continue;
+
+
+            } else {
+                if (dayInc > 2) {
+                    score += 3;
+                } else if (flag == 0) {
+                    score += 12;
+                } else if (flag == 1) {
+                    score += 6;
+                }
+            }
+        }
+
+        return score;
     }
 
 
