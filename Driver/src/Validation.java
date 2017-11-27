@@ -37,11 +37,11 @@ public class Validation {
 
     public static void validateSolution() {
         int flag = 0;
-        for (int i = 0; i < TryingChoco1.students.size(); i++) {
+        for (int i = 0; i < MainDriver.students.size(); i++) {
             //count the number of students who have 4 in 2
 
-            if (!Helper_Functions.checkIfTwoSlotsSame(TryingChoco1.students.get(i).getSlots()) ||
-                    !Helper_Functions.checkIfThreeSameDay(TryingChoco1.students.get(i).getSlots())) {
+            if (!Helper_Functions.checkIfTwoSlotsSame(MainDriver.students.get(i).getSlots()) ||
+                    !Helper_Functions.checkIfThreeSameDay(MainDriver.students.get(i).getSlots())) {
                 //System.out.println(students.get(i).getSlots() + "  " + students.get(i).getId());
                 flag = 1;
 //                System.out.println(studentExams+"\n"+students.get(i).getId());

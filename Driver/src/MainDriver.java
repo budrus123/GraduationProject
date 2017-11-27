@@ -19,11 +19,25 @@ import static org.chocosolver.solver.search.strategy.Search.activityBasedSearch;
 /**
  * @author Mahmoud
  */
-public class TryingChoco1 {
+public class MainDriver {
+        /*
+        M A I N     S T A R T   M
+        A                       A
+        I                       I
+        N                       N
 
-    /**
-     * @param args the command line arguments
-     */
+         EXAMINATION TIMETABLING
+            MAHMOUD ABDALKRIM
+             MOHAMMAD SEHWEIL
+               AHMAD ZEID
+        S                       S
+        T                       T
+        A                       A
+        R                       R
+        T                       T
+        M A I N     S T A R T   *
+        */
+
 
     //model for the problem
     static Model model = new Model("my first problem");
@@ -81,7 +95,7 @@ public class TryingChoco1 {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(TryingChoco1.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MainDriver.class.getName()).log(Level.SEVERE, null, ex);
         }
 
 
@@ -190,17 +204,22 @@ public class TryingChoco1 {
 
         }
 
-        int i = 0;
-        /*
-        M A I N   E N D
-        A
-        I
-        N
 
-        E
-        N
-        D
-         */
+         /*
+        M A I N        E N D    M
+        A                       A
+        I                       I
+        N                       N
+
+         EXAMINATION TIMETABLING
+            MAHMOUD ABDALKRIM
+             MOHAMMAD SEHWEIL
+               AHMAD ZEID
+        E                       E
+        N                       N
+        D                       D
+        M A I N        E N D    *
+        */
     }
 
 

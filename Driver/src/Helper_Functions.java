@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -211,14 +210,14 @@ public class Helper_Functions {
 
     public static void fillInterSectFactor() {
         int fact = 0;
-        for (int i = 0; i < TryingChoco1.courseAL.size(); i++) {
-            for (int j = 0; j < TryingChoco1.courseAL.size(); j++) {
-                if (getCommonCount(TryingChoco1.courseAL.get(i).getAl(), TryingChoco1.courseAL.get(j).getAl()) > 0) {
+        for (int i = 0; i < MainDriver.courseAL.size(); i++) {
+            for (int j = 0; j < MainDriver.courseAL.size(); j++) {
+                if (getCommonCount(MainDriver.courseAL.get(i).getAl(), MainDriver.courseAL.get(j).getAl()) > 0) {
                     fact++;
                 }
 
             }
-            TryingChoco1.courseAL.get(i).setIntersectFactor(fact);
+            MainDriver.courseAL.get(i).setIntersectFactor(fact);
             //System.out.println(courseAL.get(i).getLabel()+" factor of "+fact);
             fact = 0;
 
@@ -240,13 +239,13 @@ public class Helper_Functions {
 
     public static void mostCommonCourses() {
 
-        for (int i = 0; i < TryingChoco1.courseAL.size(); i++) {
-            for (int j = i + 1; j < TryingChoco1.courseAL.size(); j++) {
-                ArrayList<Student> st1 = TryingChoco1.courseAL.get(i).getAl();
-                ArrayList<Student> st2 = TryingChoco1.courseAL.get(j).getAl();
+        for (int i = 0; i < MainDriver.courseAL.size(); i++) {
+            for (int j = i + 1; j < MainDriver.courseAL.size(); j++) {
+                ArrayList<Student> st1 = MainDriver.courseAL.get(i).getAl();
+                ArrayList<Student> st2 = MainDriver.courseAL.get(j).getAl();
                 int commonCount = getCommonCount(st1, st2);
                 if (commonCount > 300) {
-                    System.out.println(TryingChoco1.courseAL.get(i).getLabel() + ", " + TryingChoco1.courseAL.get(j).getLabel() + " count is " + commonCount);
+                    System.out.println(MainDriver.courseAL.get(i).getLabel() + ", " + MainDriver.courseAL.get(j).getLabel() + " count is " + commonCount);
 
 //                    model.setObjective(Model.MAXIMIZE, variables.get(courseAL.get(i).getVariableIndex()));
 //                    model.setObjective(Model.MINIMIZE, variables.get(courseAL.get(j).getVariableIndex()));
@@ -267,14 +266,14 @@ public class Helper_Functions {
     public static void fillStudentSlots() {
         int flag = 0;
 
-        for (int i = 0; i < TryingChoco1.students.size(); i++) {
+        for (int i = 0; i < MainDriver.students.size(); i++) {
             ArrayList<Integer> studentExams = new ArrayList<Integer>();
-            for (int k = 0; k < TryingChoco1.students.get(i).getCourses().size(); k++) {
-                Course cid = (Course) TryingChoco1.students.get(i).getCourses().get(k);
-                studentExams.add(TryingChoco1.variables.get(cid.getVariableIndex()).getValue());
+            for (int k = 0; k < MainDriver.students.get(i).getCourses().size(); k++) {
+                Course cid = (Course) MainDriver.students.get(i).getCourses().get(k);
+                studentExams.add(MainDriver.variables.get(cid.getVariableIndex()).getValue());
                 //student exams has the timeslots the student has exams in
             }
-            TryingChoco1.students.get(i).setSlots(studentExams);
+            MainDriver.students.get(i).setSlots(studentExams);
 
         }
     }
@@ -319,12 +318,12 @@ public class Helper_Functions {
     //################################################################################################################
     public static void fillStudentTakesCourse() throws SQLException {
 
-        Statement stmt2 = TryingChoco1.connection.createStatement();
+        Statement stmt2 = MainDriver.connection.createStatement();
         //String s="SELECT * FROM student_course_table where COURSE_LABEL='"+courseAL.get(i).getLabel()+"'";
         ResultSet course_student2 = stmt2.executeQuery("SELECT * FROM student_course_table");
         while (course_student2.next()) {
-            TryingChoco1.courseAL.get(Integer.valueOf(course_student2.getString("course_id")) - 1).addStudent(TryingChoco1.students.get(Integer.valueOf(course_student2.getString("STUDENT_NUMBER")) - 1));
-            TryingChoco1.students.get((Integer.valueOf(course_student2.getString("STUDENT_NUMBER")) - 1)).addCourse(TryingChoco1.courseAL.get(Integer.valueOf(course_student2.getString("course_id")) - 1));
+            MainDriver.courseAL.get(Integer.valueOf(course_student2.getString("course_id")) - 1).addStudent(MainDriver.students.get(Integer.valueOf(course_student2.getString("STUDENT_NUMBER")) - 1));
+            MainDriver.students.get((Integer.valueOf(course_student2.getString("STUDENT_NUMBER")) - 1)).addCourse(MainDriver.courseAL.get(Integer.valueOf(course_student2.getString("course_id")) - 1));
         }
 
 
@@ -335,9 +334,9 @@ public class Helper_Functions {
     //################################################################################################################
     public static IntVar getCourseIntVar(Course c) {
 
-        for (int i = 0; i < TryingChoco1.model.getNbVars(); i++) {
-            if (c.getLabel().equals(TryingChoco1.model.getVar(i).getName())) {
-                return (IntVar) TryingChoco1.model.getVar(i);
+        for (int i = 0; i < MainDriver.model.getNbVars(); i++) {
+            if (c.getLabel().equals(MainDriver.model.getVar(i).getName())) {
+                return (IntVar) MainDriver.model.getVar(i);
             }
         }
         return null;

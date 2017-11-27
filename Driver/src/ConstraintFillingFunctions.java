@@ -24,12 +24,12 @@ public class ConstraintFillingFunctions {
         for (int i = 0; i < subsets.size(); i++) {
             //System.out.println(subsets.get(i)[0]+" "+subsets.get(i)[1]+" "+subsets.get(i)[2]);
             Constraint th = new Constraint("Three in a day " + i,
-                    new ThreeInADay(new IntVar[]{TryingChoco1.variables.get(subsets.get(i)[0]), TryingChoco1.variables.get(subsets.get(i)[1]),
-                            TryingChoco1.variables.get(subsets.get(i)[2])}));
-            TryingChoco1.model.post(th);
+                    new ThreeInADay(new IntVar[]{MainDriver.variables.get(subsets.get(i)[0]), MainDriver.variables.get(subsets.get(i)[1]),
+                            MainDriver.variables.get(subsets.get(i)[2])}));
+            MainDriver.model.post(th);
 
             //System.out.println(th);
-            TryingChoco1.constCounter++;
+            MainDriver.constCounter++;
 
         }
 
@@ -51,11 +51,11 @@ public class ConstraintFillingFunctions {
 
         for (int i = 0; i < subsets.size(); i++) {
             Constraint th = new Constraint("Four in two days " + i,
-                    new FourExamsInTwoADays(new IntVar[]{TryingChoco1.variables.get(subsets.get(i)[0]), TryingChoco1.variables.get(subsets.get(i)[1]),
-                            TryingChoco1.variables.get(subsets.get(i)[2]), TryingChoco1.variables.get(subsets.get(i)[3])}));
+                    new FourExamsInTwoADays(new IntVar[]{MainDriver.variables.get(subsets.get(i)[0]), MainDriver.variables.get(subsets.get(i)[1]),
+                            MainDriver.variables.get(subsets.get(i)[2]), MainDriver.variables.get(subsets.get(i)[3])}));
             //model5.allDifferent(variables).post();;
-            TryingChoco1.model.post(th);
-            TryingChoco1.constCounter++;
+            MainDriver.model.post(th);
+            MainDriver.constCounter++;
             //System.out.println(th);
 
         }
@@ -68,10 +68,10 @@ public class ConstraintFillingFunctions {
     //################################################################################################################
     public static void oneMaxForEachStudent() throws SQLException {
 
-        for (int i = 0; i < TryingChoco1.students.size(); i++) {
-            Statement stmt = TryingChoco1.connection.createStatement();
+        for (int i = 0; i < MainDriver.students.size(); i++) {
+            Statement stmt = MainDriver.connection.createStatement();
             ResultSet getStudentCourses = stmt.executeQuery("SELECT * FROM student_course_table where STUDENT_NUMBER='" + (i + 1) + "'");
-            Statement stmt2 = TryingChoco1.connection.createStatement();
+            Statement stmt2 = MainDriver.connection.createStatement();
             ResultSet getStudentCoursesCount = stmt2.executeQuery("SELECT count(*) FROM student_course_table where STUDENT_NUMBER='" + (i + 1) + "'");
 
             getStudentCoursesCount.next();
@@ -82,12 +82,12 @@ public class ConstraintFillingFunctions {
                 IntVar[] studentCourses = new IntVar[count];
 
                 while (getStudentCourses.next()) {
-                    studentCourses[q++] = TryingChoco1.variables.get(Integer.valueOf(getStudentCourses.getString(2)) - 1);
+                    studentCourses[q++] = MainDriver.variables.get(Integer.valueOf(getStudentCourses.getString(2)) - 1);
                 }
 
                 for (int m = 0; m < count; m++) {
                     for (int n = m; n < count; n++) {
-                        TryingChoco1.model.arithm(studentCourses[m], "-", studentCourses[n], ">", 2).post();
+                        MainDriver.model.arithm(studentCourses[m], "-", studentCourses[n], ">", 2).post();
 
                     }
                 }
@@ -102,10 +102,10 @@ public class ConstraintFillingFunctions {
 
     //################################################################################################################
     public static void fillHardConst() throws SQLException {
-        for (int i = 0; i < TryingChoco1.courseAL.size(); i++) {
-            for (int j = i + 1; j < TryingChoco1.courseAL.size(); j++) {
-                if (Helper_Functions.haveCommonStudents(TryingChoco1.courseAL.get(i), TryingChoco1.courseAL.get(j))) {
-                    TryingChoco1.model.allDifferent(TryingChoco1.variables.get(i), TryingChoco1.variables.get(j)).post();
+        for (int i = 0; i < MainDriver.courseAL.size(); i++) {
+            for (int j = i + 1; j < MainDriver.courseAL.size(); j++) {
+                if (Helper_Functions.haveCommonStudents(MainDriver.courseAL.get(i), MainDriver.courseAL.get(j))) {
+                    MainDriver.model.allDifferent(MainDriver.variables.get(i), MainDriver.variables.get(j)).post();
 
 
                 }
