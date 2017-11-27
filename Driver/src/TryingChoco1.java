@@ -8,6 +8,7 @@ import java.sql.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.variables.IntVar;
@@ -35,7 +36,9 @@ public class TryingChoco1 {
     //our connection
     static Connection connection;
     static double maxMean = 0;
-    static double ourScore=0;
+    static double variance = 0;
+    static double ourScore = 0;
+    static int fourin2total, b2bTotal;
 
     public static void main(String[] args) throws SQLException {
         String url = "jdbc:mysql://localhost:3306/exams";
@@ -157,10 +160,9 @@ public class TryingChoco1 {
         Collections.sort(courseAL, new Comparator<Course>() {
             @Override
             public int compare(Course o1, Course o2) {
-                if(o1.getAl().size() < o2.getAl().size()){
+                if (o1.getAl().size() < o2.getAl().size()) {
                     return 1;
-                }
-                else{
+                } else {
                     return -1;
                 }
             }
@@ -171,9 +173,20 @@ public class TryingChoco1 {
         while (s.solve()) {
             Helper_Functions.fillStudentSlots();
             Validation.validateSolution();
-            calculateStats();
+            double current = StatCalculationFunctions.calculateStats();
+
+            if (current > maxMean) {
+                maxMean = current;
+                System.out.println("New max : " + maxMean);
+                System.out.println("average mean of the solution = " + maxMean);
+                System.out.println("average variance of the solution = " + variance);
+                System.out.println("back to back count is: " + b2bTotal);
+                System.out.println("4 in 2 count is: " + fourin2total);
+
+            }
+
             model.getSolver().setRestartOnSolutions();
-          //System.out.println("Number of slots in our solution is equal to number of slots of University solution : " + Validation.numberTimeSlots(students));  // el mafrod awal wahde true mesh false !!
+            //System.out.println("Number of slots in our solution is equal to number of slots of University solution : " + Validation.numberTimeSlots(students));  // el mafrod awal wahde true mesh false !!
 
         }
 
@@ -189,52 +202,6 @@ public class TryingChoco1 {
         D
          */
     }
-
-    public static void calculateStats() {
-        double avgSum = 0;
-        double varSum = 0;
-        int countHasExams = 0;
-        int b2bTotal = 0;
-        int fourin2total = 0;
-        for (int i = 0; i < students.size(); i++) {
-            fourin2total += StatCalculationFunctions.FourInTwo(students.get(i).getSlots());
-            b2bTotal += StatCalculationFunctions.b2b(students.get(i).getSlots());
-            if (students.get(i).getSlots().size() > 0) {
-                //students.get(i).printSlots();
-                StatCalculationFunctions.calculateFullExamLengeth(students.get(i), i);
-                avgSum += StatCalculationFunctions.calculateAvgDaysBetweenExams(students.get(i), i);
-                varSum += StatCalculationFunctions.calculateVarianceOfSpace(students.get(i), i);
-
-                //System.out.println(" ");
-                countHasExams++;
-            }
-
-        }
-
-        if(fourin2total<200){
-            System.out.println("4 in 2 count is: "+fourin2total);
-            System.out.println("average mean of the solution = " + (avgSum / countHasExams));
-            System.out.println("average variance of the solution = " + (varSum / countHasExams));
-            System.out.println("back to back count is: " + b2bTotal);
-        }
-        double max = avgSum / countHasExams;
-        if (max > maxMean) {
-            maxMean = max;
-            System.out.println("New max : " + maxMean);
-            System.out.println("average mean of the solution = " + (avgSum / countHasExams));
-            System.out.println("average variance of the solution = " + (varSum / countHasExams));
-            System.out.println("back to back count is: " + b2bTotal);
-            System.out.println("4 in 2 count is: " + fourin2total);
-
-//            for (int j = 0; j < variables.size(); j++) {
-//                System.out.println(variables.get(j)+"\tvar index"+j);
-//            }
-        }
-
-
-        //return avgSum / countHasExams;
-    }
-
 
 
 }

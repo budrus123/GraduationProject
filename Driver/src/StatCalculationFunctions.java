@@ -132,4 +132,51 @@ public class StatCalculationFunctions {
     }
 
 
+    public static double calculateStats() {
+        double avgSum = 0;
+        double varSum = 0;
+        int countHasExams = 0;
+        TryingChoco1.b2bTotal = 0;
+        TryingChoco1.fourin2total = 0;
+        for (int i = 0; i < TryingChoco1.students.size(); i++) {
+            TryingChoco1.fourin2total += StatCalculationFunctions.FourInTwo(TryingChoco1.students.get(i).getSlots());
+            TryingChoco1.b2bTotal += StatCalculationFunctions.b2b(TryingChoco1.students.get(i).getSlots());
+            if (TryingChoco1.students.get(i).getSlots().size() > 0) {
+                //students.get(i).printSlots();
+                StatCalculationFunctions.calculateFullExamLengeth(TryingChoco1.students.get(i), i);
+                avgSum += StatCalculationFunctions.calculateAvgDaysBetweenExams(TryingChoco1.students.get(i), i);
+                varSum += StatCalculationFunctions.calculateVarianceOfSpace(TryingChoco1.students.get(i), i);
+
+                //System.out.println(" ");
+                countHasExams++;
+            }
+
+        }
+        double max = avgSum / (double) countHasExams;
+        TryingChoco1.variance = (varSum / countHasExams);
+
+        if (TryingChoco1.fourin2total < 30) {
+            System.out.println("4 in 2 count is: " + TryingChoco1.fourin2total);
+            System.out.println("average mean of the solution = " + (avgSum / countHasExams));
+            System.out.println("average variance of the solution = " + (varSum / countHasExams));
+            System.out.println("back to back count is: " + TryingChoco1.b2bTotal);
+        }
+//        if (max > maxMean) {
+//            maxMean = max;
+//            System.out.println("New max : " + maxMean);
+//            System.out.println("average mean of the solution = " + (avgSum / countHasExams));
+//            System.out.println("average variance of the solution = " + (varSum / countHasExams));
+//            System.out.println("back to back count is: " + b2bTotal);
+//            System.out.println("4 in 2 count is: " + fourin2total);
+//
+////            for (int j = 0; j < variables.size(); j++) {
+////                System.out.println(variables.get(j)+"\tvar index"+j);
+////            }
+//        }
+
+
+        return max;
+    }
+
+
 }

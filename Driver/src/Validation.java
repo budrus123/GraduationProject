@@ -3,14 +3,14 @@ import java.util.ArrayList;
 public class Validation {
 
 
-    public static boolean numberTimeSlots(ArrayList<Student> students){
+    public static boolean numberTimeSlots(ArrayList<Student> students) {
 
         int numberOfSlots = 0;
         int numberOfUniversitySlots = 0;
-        for(Student student: students){
-            numberOfSlots+=student.getSlots().size();
-            numberOfUniversitySlots+=student.getSlotsU().size();
-            if(student.getSlots().size()!=student.getSlotsU().size()){
+        for (Student student : students) {
+            numberOfSlots += student.getSlots().size();
+            numberOfUniversitySlots += student.getSlotsU().size();
+            if (student.getSlots().size() != student.getSlotsU().size()) {
                 System.out.println(student.getSlots());
                 System.out.println(student.getSlotsU());
 
@@ -21,8 +21,7 @@ public class Validation {
     }
 
 
-
-    public static boolean validateUniversitySolution(ArrayList<Student> students){
+    public static boolean validateUniversitySolution(ArrayList<Student> students) {
 
         boolean flag = true;
         for (int i = 0; i < students.size(); i++) {
@@ -54,7 +53,6 @@ public class Validation {
             System.out.println("solution is not valid");
 
     }
-
 
 
 }
