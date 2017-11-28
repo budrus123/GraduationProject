@@ -73,7 +73,7 @@ public class MainDriver {
             Statement stmt = connection.createStatement();
             ResultSet getCourses = stmt.executeQuery("SELECT * FROM course_table Order By course_table.id");
             while (getCourses.next()) {
-                IntVar temp = model.intVar(getCourses.getString("COURSE_LABEL"), 1, 60); // phys141 in 1 2 3
+                IntVar temp = model.intVar(getCourses.getString("COURSE_LABEL"), 1, 36); // phys141 in 1 2 3
                 variables.add(temp);
                 Course co = new Course(Integer.valueOf(getCourses.getString("id")), getCourses.getString("COURSE_LABEL"), getCourses.getString("COURSE TITLE"), getCourses.getString("DEPT"), c++);
                 courseAL.add(co);
