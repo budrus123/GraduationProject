@@ -34,6 +34,32 @@ public class ConstraintFillingFunctions {
         }
 
     }
+    static public void studentHassThreeOrMoreNumber2(ArrayList<Course> courseAL) {
+
+        int[] input = new int[courseAL.size()];    // input array
+
+        for (int i = 0; i < courseAL.size(); i++) {
+            input[i] = courseAL.get(i).getVariableIndex();
+        }
+        int k = 3;
+        List<int[]> subsets = Helper_Functions.allCombination(input, k);
+        //System.out.println(variables.get(courseAL.get(i).getVariableIndex()) +" "+variables[i+1]+"  "+variables[j]);
+
+        for (int i = 0; i < subsets.size(); i++) {
+            //System.out.println(subsets.get(i)[0]+" "+subsets.get(i)[1]+" "+subsets.get(i)[2]);
+            Constraint th = new Constraint("Three in a row " + i,
+                    new ThreeInaRow(new IntVar[]{MainDriver.variables.get(subsets.get(i)[0]), MainDriver.variables.get(subsets.get(i)[1]),
+                            MainDriver.variables.get(subsets.get(i)[2])}));
+            MainDriver.model.post(th);
+
+            //System.out.println(th);
+            MainDriver.constCounter++;
+
+        }
+
+    }
+
+
     //################################################################################################################
 
 

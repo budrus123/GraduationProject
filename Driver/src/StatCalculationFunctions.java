@@ -1,3 +1,5 @@
+import sun.applet.Main;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -138,9 +140,11 @@ public class StatCalculationFunctions {
         int countHasExams = 0;
         MainDriver.b2bTotal = 0;
         MainDriver.fourin2total = 0;
+        MainDriver.end5start8sum=0;
         for (int i = 0; i < MainDriver.students.size(); i++) {
             MainDriver.fourin2total += StatCalculationFunctions.FourInTwo(MainDriver.students.get(i).getSlots());
             MainDriver.b2bTotal += StatCalculationFunctions.b2b(MainDriver.students.get(i).getSlots());
+            MainDriver.end5start8sum+=StatCalculationFunctions.from5end8start(MainDriver.students.get(i).getSlots());
             if (MainDriver.students.get(i).getSlots().size() > 0) {
                 //students.get(i).printSlots();
                 StatCalculationFunctions.calculateFullExamLengeth(MainDriver.students.get(i), i);
@@ -176,6 +180,25 @@ public class StatCalculationFunctions {
 
 
         return max;
+    }
+
+    public static int from5end8start(ArrayList<Integer> slots) {
+        Collections.sort(slots);
+        int sum = 0;
+        for (int i = 0; i < slots.size(); i++) {
+            if (i == 0)
+                continue;
+            else {
+                if ((slots.get(i) % 3 == 1) && Math.abs(slots.get(i - 1) - slots.get(i)) == 1) {
+                    sum += 1;
+                }
+                //print(abs(list[index]-list[index-1]))
+
+            }
+        }
+        return sum;
+
+
     }
 
 
