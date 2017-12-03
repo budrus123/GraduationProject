@@ -134,6 +134,9 @@ public class UniversityData {
         System.out.println("average variance of the University solution = " + (varSum / countHasExams));
         System.out.println("back to back total uni = " + b2bTotal);
         System.out.println("4 in 2 count  = " + fourIn2total);
+        System.out.println("score of uni solution" + MainDriver.score((avgSum / countHasExams),
+                (varSum / countHasExams),b2bTotal,fourIn2total));
+
         System.out.println("\n\n");
 
     }

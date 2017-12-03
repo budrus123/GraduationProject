@@ -53,6 +53,7 @@ public class MainDriver {
     static double maxMean = 0;
     static double variance = 0;
     static double ourScore = 0;
+
     static int fourin2total, b2bTotal,end5start8sum;
 
     public static void main(String[] args) throws SQLException {
@@ -72,10 +73,15 @@ public class MainDriver {
             */
             Statement stmt = connection.createStatement();
             ResultSet getCourses = stmt.executeQuery("SELECT * FROM course_table Order By course_table.id");
+
             while (getCourses.next()) {
-                IntVar temp = model.intVar(getCourses.getString("COURSE_LABEL"), 1, 36); // phys141 in 1 2 3
+
+                IntVar temp = model.intVar(getCourses.getString("COURSE_LABEL"), 1, 36);
                 variables.add(temp);
-                Course co = new Course(Integer.valueOf(getCourses.getString("id")), getCourses.getString("COURSE_LABEL"), getCourses.getString("COURSE TITLE"), getCourses.getString("DEPT"), c++);
+
+                Course co = new Course(Integer.valueOf(getCourses.getString("id")),
+                        getCourses.getString("COURSE_LABEL"), getCourses.getString("COURSE TITLE"),
+                        getCourses.getString("DEPT"), c++);
                 courseAL.add(co);
 
             }
@@ -124,8 +130,8 @@ public class MainDriver {
         //oneMaxForEachStudent();
         for (int p = 0; p < students.size(); p++) {
             if (students.get(p).getCourses().size() >= 3) {
-                //ConstraintFillingFunctions.studentHasThreeOrMore(students.get(p).getCourses());
-                ConstraintFillingFunctions.studentHassThreeOrMoreNumber2(students.get(p).getCourses());
+                ConstraintFillingFunctions.studentHasThreeOrMore(students.get(p).getCourses());
+                //ConstraintFillingFunctions.studentHassThreeOrMoreNumber2(students.get(p).getCourses());
 
             }
 //            if(students.get(p).getCourses().size()>=4){
@@ -144,9 +150,9 @@ public class MainDriver {
         Collections.sort(courseAL);
 
         //System.out.println(courseAL.size());
-        for (int i = 0; i < courseAL.size(); i++) {
-            System.out.println(courseAL.get(i).getIntersectFactor() + " " + courseAL.get(i).getLabel() + " var index is:" + courseAL.get(i).getVariableIndex());
-        }
+//        for (int i = 0; i < courseAL.size(); i++) {
+////            System.out.println(courseAL.get(i).getIntersectFactor() + " " + courseAL.get(i).getLabel() + " var index is:" + courseAL.get(i).getVariableIndex());
+//        }
 
 
         /*
@@ -191,17 +197,27 @@ public class MainDriver {
             Helper_Functions.fillStudentSlots();
             Validation.validateSolution();
             double current = StatCalculationFunctions.calculateStats();
-
-            if (current > maxMean) {
+            double currScore=MainDriver.score(current,variance,b2bTotal,fourInTwoCounter);
+            if( currScore> ourScore){
                 maxMean = current;
-                System.out.println("New max : " + maxMean);
+                ourScore=currScore;
+                System.out.println("score is: "+ourScore);
                 System.out.println("average mean of the solution = " + maxMean);
                 System.out.println("average variance of the solution = " + variance);
                 System.out.println("back to back count is: " + b2bTotal);
                 System.out.println("4 in 2 count is: " + fourin2total);
                 System.out.println("ends 5 starts 8 total is: " + end5start8sum);
-
             }
+//            if (current > maxMean) {
+//                maxMean = current;
+//                System.out.println("New max : " + maxMean);
+//                System.out.println("average mean of the solution = " + maxMean);
+//                System.out.println("average variance of the solution = " + variance);
+//                System.out.println("back to back count is: " + b2bTotal);
+//                System.out.println("4 in 2 count is: " + fourin2total);
+//                System.out.println("ends 5 starts 8 total is: " + end5start8sum);
+//
+//            }
 
             model.getSolver().setRestartOnSolutions();
             //System.out.println("Number of slots in our solution is equal to number of slots of University solution : " + Validation.numberTimeSlots(students));  // el mafrod awal wahde true mesh false !!
@@ -226,7 +242,10 @@ public class MainDriver {
         */
     }
 
-
+    public static double score(double mean, double var, int b2b, int fourInTow){
+        double score=(mean/(Math.sqrt(var)) - (1.57*b2b / 55000) - (36.6*fourInTow/55000));
+        return score;
+    }
 
 
 
