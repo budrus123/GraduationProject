@@ -20,11 +20,13 @@ CREATE TABLE IF NOT EXISTS `course_table` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1005 DEFAULT CHARSET=latin1;\
 */
-public class Course {
+public class Course implements Comparable<Course> {
     
     private String label,title,dept;
     private int id;
     private int variableIndex;
+    private int intersectFactor;
+    private boolean taken=false;
     //each course has an arraylist of students of the students that take this course
     private ArrayList <Student>al = new ArrayList<Student>();
     
@@ -127,5 +129,26 @@ public class Course {
 
     public void setVariableIndex(int variableIndex) {
         this.variableIndex = variableIndex;
+    }
+
+    public int getIntersectFactor() {
+        return intersectFactor;
+    }
+
+    public void setIntersectFactor(int intersectFactor) {
+        this.intersectFactor = intersectFactor;
+    }
+
+    @Override
+    public int compareTo(Course o) {
+        return (this.getIntersectFactor() - o.getIntersectFactor())*-1;
+    }
+
+    public boolean isTaken() {
+        return taken;
+    }
+
+    public void setTaken(boolean taken) {
+        this.taken = taken;
     }
 }
