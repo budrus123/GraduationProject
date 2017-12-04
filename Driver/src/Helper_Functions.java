@@ -392,5 +392,8 @@ public class Helper_Functions {
         return score;
     }
 
+    public static int getDay(int slot){
+        return (slot - 1) / 3;
+    }
 
 }

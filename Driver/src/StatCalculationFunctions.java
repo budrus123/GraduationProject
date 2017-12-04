@@ -25,73 +25,69 @@ public class StatCalculationFunctions {
     }
 
 
-    public static double calculateVarianceOfSpace(Student stu, int q) {
-        int[][] s2D = stu.getSlots2D();
+    public static double calculateVarianceOfSpaceForOneStudent(Student student) {
+        int[][] s2D = student.getSlots2D();
+        ArrayList<Integer> samples = getSpacesSamples(student);
         double sum = 0;
-        int count = 0;
-        for (int i = (stu.getFirstSlot() - 1) / 3; i < (((stu.getLastSlot() - 1) / 3) + 1); i++) {
-            if (i == (stu.getFirstSlot() - 1) / 3) {
-                continue;
-            }
-            if ((s2D[i][0] == 0) && (s2D[i][1] == 0) && (s2D[i][2] == 0)) {
-                count++;
-            }
-            if ((s2D[i][0] == 1) || (s2D[i][1] == 1) || (s2D[i][2] == 1)) {
-                if (s2D[i][0] == 1) {
-                    sum += Math.pow((double) count - stu.getAvgDaysBetweenExams(), 2);
-                    count = 0;
-                }
-                if (s2D[i][1] == 1) {
-                    sum += Math.pow((double) count - stu.getAvgDaysBetweenExams(), 2);
 
-                    count = 0;
-                }
-                if (s2D[i][2] == 1) {
-                    sum += Math.pow((double) count - stu.getAvgDaysBetweenExams(), 2);
-
-                    count = 0;
-                }
-
-            }
-
-
+        for (int space:samples){
+            sum += Math.pow((double) space - student.getAvgDaysBetweenExams(), 2);
         }
-        int m = (stu.getFirstSlot() - 1) / 3;
+        int m = Helper_Functions.getDay(student.getFirstSlot());
         int numofExamsFirstDay = s2D[m][0] + s2D[m][1] + s2D[m][2];
-        double var = sum / ((double) stu.getSlots().size() - numofExamsFirstDay - 1);
+        double var = sum / ((double) student.getSlots().size() - numofExamsFirstDay);
         if (Double.isNaN(var)) {
-            MainDriver.students.get(q).setVarianceOfSpaces(0);
-
+            student.setVarianceOfSpaces(0);
         } else {
-            MainDriver.students.get(q).setVarianceOfSpaces(sum / ((double) stu.getSlots().size() - numofExamsFirstDay - 1));
+            student.setVarianceOfSpaces(var);
         }
-
-        //System.out.println("Variance of number of days between exams is "+students.get(q).getVarianceOfSpaces()+" days");
-        return MainDriver.students.get(q).getVarianceOfSpaces();
-        //System.out.println("num is -> "+((double)stu.getSlots().size() - numofExamsFirstDay-1));
+        System.out.println(student.getVarianceOfSpaces());
+        return student.getVarianceOfSpaces();
     }
 
 
-    public static double calculateAvgDaysBetweenExams(Student stu, int q) {
-        int[][] s2D = stu.getSlots2D();
+
+    public static double calculateAvgSpacesBetweenExamsForOneStudent(Student student) {
+        int[][] s2D = student.getSlots2D();
+        System.out.println("-----------------------------------------------------------------------------------------");
+        System.out.println(Arrays.deepToString(s2D));
+
+        ArrayList<Integer> samples = getSpacesSamples(student);
+        int sumOfSpaces = 0;
+        for (int space:samples){
+            sumOfSpaces+=space;
+        }
+        int m = Helper_Functions.getDay(student.getFirstSlot());
+        int numofExamsFirstDay = s2D[m][0] + s2D[m][1] + s2D[m][2];
+        double avg = (sumOfSpaces) / ((double) student.getSlots().size() - numofExamsFirstDay);
+        if (Double.isNaN(avg)) {
+            student.setAvgDaysBetweenExams(0);
+        } else {
+            student.setAvgDaysBetweenExams(avg);
+        }
+        System.out.println(student.getAvgDaysBetweenExams());
+        return student.getAvgDaysBetweenExams();
+    }
+
+
+    public static ArrayList<Integer> getSpacesSamples(Student student) {
+        int[][] s2D = student.getSlots2D();
+        ArrayList<Integer> samples = new ArrayList<Integer>();
         int count = 0;
-        for (int i = (stu.getFirstSlot() - 1) / 3; i < (stu.getLastSlot() - 1) / 3; i++) {
-            if ((s2D[i][0] == 0) && (s2D[i][1] == 0) && (s2D[i][2] == 0)) {
+        for (int i = Helper_Functions.getDay(student.getFirstSlot())+1; i <= Helper_Functions.getDay(student.getLastSlot()); i++) {
+            if ((s2D[i][0] == 0) && (s2D[i][1] == 0) && (s2D[i][2] == 0)) {   // No exams in this day
                 count++;
             }
 
+            if ((s2D[i][0] == 1) || (s2D[i][1] == 1) || (s2D[i][2] == 1)) {
+                samples.add(count);
+                count = 0;
+            }
         }
-        int m = (stu.getFirstSlot() - 1) / 3;
-        int numofExamsFirstDay = s2D[m][0] + s2D[m][1] + s2D[m][2];
-        double avg = (count) / ((double) stu.getSlots().size() - numofExamsFirstDay);
-        if (Double.isNaN(avg)) {
-            MainDriver.students.get(q).setAvgDaysBetweenExams(0);
-        } else {
-            MainDriver.students.get(q).setAvgDaysBetweenExams(avg);
-        }
-        // System.out.println("Average number of days between exams is "+(count)/((double)stu.getSlots().size()-1)+" days");
-        return MainDriver.students.get(q).getAvgDaysBetweenExams();
+        return samples;
     }
+
+
 
     public static void calculateFullExamLengeth(Student stu, int k) {
         int firstSlot, LastSlot;
@@ -148,8 +144,8 @@ public class StatCalculationFunctions {
             if (MainDriver.students.get(i).getSlots().size() > 0) {
                 //students.get(i).printSlots();
                 StatCalculationFunctions.calculateFullExamLengeth(MainDriver.students.get(i), i);
-                avgSum += StatCalculationFunctions.calculateAvgDaysBetweenExams(MainDriver.students.get(i), i);
-                varSum += StatCalculationFunctions.calculateVarianceOfSpace(MainDriver.students.get(i), i);
+                avgSum += StatCalculationFunctions.calculateAvgSpacesBetweenExamsForOneStudent(MainDriver.students.get(i));
+                varSum += StatCalculationFunctions.calculateVarianceOfSpaceForOneStudent(MainDriver.students.get(i));
 
                 //System.out.println(" ");
                 countHasExams++;
