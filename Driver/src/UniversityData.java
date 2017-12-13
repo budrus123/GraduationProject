@@ -115,6 +115,7 @@ public class UniversityData {
         int countHasExams = 0;
         int b2bTotal = 0;
         int fourIn2total = 0;
+        int SumScoreU = 0;
         for (int i = 0; i < students.size(); i++) {
 
             b2bTotal += StatCalculationFunctions.b2b(students.get(i).getSlotsU());
@@ -124,18 +125,48 @@ public class UniversityData {
                 calculateFullExamLengethU(students.get(i));
                 avgSum += calculateAvgDaysBetweenExams(students.get(i));
                 varSum += calculateVarianceOfSpace(students.get(i));
-
+                //SumScoreU+=MainDriver.getScore(students.get(i).getSlotsU(),i);
                 //System.out.println(" ");
                 countHasExams++;
             }
 
         }
+        System.out.println("Score of uni solution is " + SumScoreU);
         System.out.println("average mean of the University solution = " + (avgSum / countHasExams));
         System.out.println("average variance of the University solution = " + (varSum / countHasExams));
         System.out.println("back to back total uni = " + b2bTotal);
         System.out.println("4 in 2 count  = " + fourIn2total);
         System.out.println("score of uni solution" + MainDriver.score((avgSum / countHasExams),
-                (varSum / countHasExams),b2bTotal,fourIn2total));
+                (varSum / countHasExams), b2bTotal, fourIn2total));
+
+        int[] num = new int[9];
+        double[] score = new double[9];
+
+        for (int i = 0; i < num.length; i++) {
+            num[i] = 0;
+            score[i] = 0;
+        }
+        int num2, num3, num4, num5, num6, num7, num8, num9;
+        double score2 = 0, score3, score4, score5, score6, score7, score8, score9;
+        num2 = num3 = num4 = num5 = num6 = num7 = num8 = num9 = 0;
+        score2 = score3 = score4 = score5 = score6 = score7 = score8 = score9 = 0;
+
+        for (int i = 0; i < MainDriver.students.size(); i++) {
+            if(MainDriver.students.get(i).getSlotsU().size()>1){
+                num[MainDriver.students.get(i).getSlotsU().size() - 1]++;
+                score[MainDriver.students.get(i).getSlotsU().size() - 1] += ScoringSystem.score(MainDriver.students.get(i).getSlots2DU());
+
+            }
+
+            //SumScore+= getScore(students.get(i).getSlots(),i);
+        }
+
+        double sumScore = 0;
+        for (int i = 1; i < num.length; i++) {
+            sumScore += num[i] * score[i];
+        }
+
+        System.out.println("uni score = " + sumScore);
 
         System.out.println("\n\n");
 

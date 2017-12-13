@@ -53,8 +53,9 @@ public class MainDriver {
     static double maxMean = 0;
     static double variance = 0;
     static double ourScore = 0;
+    public static int lenOfExamPeriod = 36;
 
-    static int fourin2total, b2bTotal,end5start8sum;
+    static int fourin2total, b2bTotal, end5start8sum;
 
     public static void main(String[] args) throws SQLException {
         String url = "jdbc:mysql://localhost:3306/exams";
@@ -193,34 +194,93 @@ public class MainDriver {
 
         Solver s = model.getSolver();
         s.setSearch(activityBasedSearch(varArr));
+
+        for (int i = 0; i < courseAL.size(); i++) {
+            System.out.println(courseAL.get(i).getAl().size() + "  " + courseAL.get(i).getLabel());
+        }
+
+        //ArrayList<Course> [] dailyExams = new ArrayList<Course>()[lenOfExamPeriod];
+
+
         while (s.solve()) {
+//            ArrayList<ArrayList<Course>> dailyExams = new ArrayList<ArrayList<Course>>(lenOfExamPeriod);
             Helper_Functions.fillStudentSlots();
             Validation.validateSolution();
             double current = StatCalculationFunctions.calculateStats();
-            double currScore=MainDriver.score(current,variance,b2bTotal,fourInTwoCounter);
-            if( currScore> ourScore){
+            double currScore = MainDriver.score(current, variance, b2bTotal, fourInTwoCounter);
+            if (currScore > ourScore) {
                 maxMean = current;
-                ourScore=currScore;
-                System.out.println("score is: "+ourScore);
+                ourScore = currScore;
+                System.out.println("score is: " + ourScore);
                 System.out.println("average mean of the solution = " + maxMean);
                 System.out.println("average variance of the solution = " + variance);
                 System.out.println("back to back count is: " + b2bTotal);
                 System.out.println("4 in 2 count is: " + fourin2total);
                 System.out.println("ends 5 starts 8 total is: " + end5start8sum);
-            }
-//            if (current > maxMean) {
-//                maxMean = current;
-//                System.out.println("New max : " + maxMean);
-//                System.out.println("average mean of the solution = " + maxMean);
-//                System.out.println("average variance of the solution = " + variance);
-//                System.out.println("back to back count is: " + b2bTotal);
-//                System.out.println("4 in 2 count is: " + fourin2total);
-//                System.out.println("ends 5 starts 8 total is: " + end5start8sum);
-//
-//            }
 
+            }
+            int[] num = new int[9];
+            double[] score = new double[9];
+
+            for (int i = 0; i < num.length; i++) {
+                num[i] = 0;
+                score[i] = 0;
+            }
+            int num2, num3, num4, num5, num6, num7, num8, num9;
+            double score2 = 0, score3, score4, score5, score6, score7, score8, score9;
+            num2 = num3 = num4 = num5 = num6 = num7 = num8 = num9 = 0;
+            score2 = score3 = score4 = score5 = score6 = score7 = score8 = score9 = 0;
+
+            for (int i = 0; i < MainDriver.students.size(); i++) {
+                if (MainDriver.students.get(i).getSlots().size() > 1) {
+                    num[MainDriver.students.get(i).getSlots().size() - 1]++;
+                    score[MainDriver.students.get(i).getSlots().size() - 1] += ScoringSystem.score(MainDriver.students.get(i).getSlots2D());
+                }
+                //SumScore+= getScore(students.get(i).getSlots(),i);
+            }
+
+            double sumScore = 0;
+            for (int i = 1; i < num.length; i++) {
+                sumScore += num[i] * score[i];
+            }
+
+            System.out.println("our score = " + sumScore);
+            ArrayList<ArrayList<Course>> dailyExams = new ArrayList<ArrayList<Course>>();
+
+//            outer.add(inner);
+//            Course cc=courseAL.get(18);
+//            dailyExams.get(0).add(cc);
+            for (int j = 1; j < lenOfExamPeriod+1; j++) {
+                ArrayList<Course> inner = new ArrayList<Course>();
+                for (int i = 0; i < courseAL.size(); i++) {
+                    //dailyExams.get(i) = new ArrayList<Course>();
+                    if (variables.get(courseAL.get(i).getVariableIndex()).getValue() == j) {
+                        inner.add(courseAL.get(i));
+                    }
+                }
+                dailyExams.add(inner);
+            }
+
+
+            //
+//            for (int i = 0; i < courseAL.size(); i++) {
+//                dailyExams.get(variables.get(courseAL.get(i).getVariableIndex()+1).getValue()).add(courseAL.get(i));
+//            }
+            ///start from here abuzaid
+            for (int i = 0; i < lenOfExamPeriod; i++) {
+                int sumStu=0;
+                for (int j = 0; j < dailyExams.get(i).size(); j++) {
+                    System.out.println(dailyExams.get(i).get(j));
+                    sumStu+=dailyExams.get(i).get(j).getAl().size();
+                }
+                System.out.println("exams in slot " + (i+1)+" the number of them is "+ dailyExams.get(i).size());
+                System.out.println("num of bitches who take this "+sumStu);
+                System.out.println("\n\n");
+
+
+            }
             model.getSolver().setRestartOnSolutions();
-            //System.out.println("Number of slots in our solution is equal to number of slots of University solution : " + Validation.numberTimeSlots(students));  // el mafrod awal wahde true mesh false !!
+
 
         }
 
@@ -242,11 +302,58 @@ public class MainDriver {
         */
     }
 
-    public static double score(double mean, double var, int b2b, int fourInTow){
-        double score=(mean/(Math.sqrt(var)) - (1.57*b2b / 55000) - (36.6*fourInTow/55000));
+    public static double score(double mean, double var, int b2b, int fourInTow) {
+        double score = (mean / (Math.sqrt(var)) - (1.57 * b2b / 55000) - (36.6 * fourInTow / 55000));
         return score;
     }
 
+
+    public static int getScore(ArrayList<Integer> slots, int index) {
+        int scoreSum = 0;
+        int score = 0;
+
+        //score=0;
+//            if (slots.size() > 0) {
+//                System.out.println("Student has [" + students.get(index).getSlots().size() + "] exams, slots are:");
+//                students.get(index).printSlots();
+//            }
+        int fInt = StatCalculationFunctions.FourInTwo(slots);
+        score -= fInt * 20;
+
+        int b2b = StatCalculationFunctions.b2b(slots);
+        score -= b2b * 5;
+
+        int firstDay = (students.get(index).getFirstSlot() - 1) / 3;
+        int lastDay = (students.get(index).getLastSlot() - 1) / 3;
+        int examLen = students.get(index).getExamsLen();
+
+//            for (int j = 0; j < students.get(i).getSlots2D().length; j++) {
+//
+//                if ((students.get(i).getSlots2D()[i][0] == 0) &&
+//                        (students.get(i).getSlots2D()[i][1] == 0) &&
+//                        (students.get(i).getSlots2D()[i][2] == 0)) {
+//                    continue;
+//                }
+//
+//
+//            }
+        if (slots.size() > 0) {
+
+            Collections.sort(slots);
+            for (int q = 1; q < slots.size(); q++) {
+
+                if (slots.get(q) - slots.get(q - 1) >= 7) {
+                    score += 10;
+                } else if (slots.get(q) - slots.get(q - 1) >= 4) {
+                    score += 5;
+                }
+            }
+        }
+        return score;
+        // System.out.println("Score is: "+score);
+
+
+    }
 
 
 }

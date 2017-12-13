@@ -171,11 +171,11 @@ public class Student {
         //System.out.println(slots2D);
 
         for (int i = 0; i < 12; i++) {
-            System.out.print("day " + (i + 1) + " -> ");
+            //System.out.print("day " + (i + 1) + " -> ");
             for (int k = 0; k < 3; k++) {
                 System.out.print(slots2D[i][k] + " ");
             }
-            System.out.println("");
+            System.out.println(",");
         }
     }
 

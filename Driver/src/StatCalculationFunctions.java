@@ -41,7 +41,7 @@ public class StatCalculationFunctions {
         } else {
             student.setVarianceOfSpaces(var);
         }
-        System.out.println(student.getVarianceOfSpaces());
+        //System.out.println(student.getVarianceOfSpaces());
         return student.getVarianceOfSpaces();
     }
 
@@ -49,8 +49,8 @@ public class StatCalculationFunctions {
 
     public static double calculateAvgSpacesBetweenExamsForOneStudent(Student student) {
         int[][] s2D = student.getSlots2D();
-        System.out.println("-----------------------------------------------------------------------------------------");
-        System.out.println(Arrays.deepToString(s2D));
+        //System.out.println("-----------------------------------------------------------------------------------------");
+       // System.out.println(Arrays.deepToString(s2D));
 
         ArrayList<Integer> samples = getSpacesSamples(student);
         int sumOfSpaces = 0;
@@ -65,7 +65,7 @@ public class StatCalculationFunctions {
         } else {
             student.setAvgDaysBetweenExams(avg);
         }
-        System.out.println(student.getAvgDaysBetweenExams());
+        //System.out.println(student.getAvgDaysBetweenExams());
         return student.getAvgDaysBetweenExams();
     }
 
