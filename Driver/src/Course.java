@@ -31,9 +31,16 @@ public class Course implements Comparable<Course> {
     private ArrayList <Student>al = new ArrayList<Student>();
     ArrayList<Room> rooms = new ArrayList<Room>();
 
-    
-    
-    public Course(int id,String label,String title,String dept,int variableIndex){
+
+    public ArrayList<Room> getRooms() {
+        return rooms;
+    }
+
+    public void setRooms(ArrayList<Room> rooms) {
+        this.rooms = rooms;
+    }
+
+    public Course(int id, String label, String title, String dept, int variableIndex){
         this.id=id;
         this.label=label;
         this.title=title;

@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.variables.IntVar;
+import sun.security.x509.AVA;
 
 
 import static org.chocosolver.solver.search.strategy.Search.activityBasedSearch;
@@ -47,6 +48,8 @@ public class MainDriver {
     static ArrayList<Course> courseAL = new ArrayList<Course>();
     static ArrayList<IntVar> variables = new ArrayList<IntVar>();
     static ArrayList<Student> students = new ArrayList<Student>();
+    static ArrayList<Room> Rooms = new ArrayList<Room>();
+
     static int constCounter = 0;
     //our connection
     static Connection connection;
@@ -58,12 +61,13 @@ public class MainDriver {
     static int fourin2total, b2bTotal, end5start8sum;
 
     public static void main(String[] args) throws SQLException {
-        String url = "jdbc:mysql://localhost:3306/exams";
+        String url = "jdbc:mysql://localhost:3308/exams";
         String username = "root";
-        String password = Password.password;
+        String password = "";
         System.out.println("Connecting database...");
         int c = 0;
         try {
+
             connection = DriverManager.getConnection(url, username, password);
             System.out.println("Database connected!");
 
@@ -102,11 +106,28 @@ public class MainDriver {
                 // System.out.println(s);
             }
 
+
+               /*
+            this is to fill the student arraylist (all the students)
+            */
+            Statement stmt3 = connection.createStatement();
+            ResultSet getRoom = stmt3.executeQuery("SELECT * FROM room_table");
+            while (getRoom.next()) {
+                //String s = rs.getString("id")+" "+rs.getString("COURSE_LABEL");
+                Room r = new Room(Integer.valueOf(getRoom.getString("id")) , Integer.valueOf(getRoom.getString("CAPACITY")) , getRoom.getString("ROOM"));
+                Rooms.add(r);
+//                System.out.println(r.getId() + " " + r.getLabel() + " " + r.getCapacity());
+//                System.out.println("\n\n");
+                // System.out.println(s);
+            }
+
         } catch (SQLException ex) {
             Logger.getLogger(MainDriver.class.getName()).log(Level.SEVERE, null, ex);
         }
 
 
+// Sort Room depinding on Capacity
+        Collections.sort(Rooms);
 
         /*
         first function is to fill the student array list 
@@ -195,9 +216,10 @@ public class MainDriver {
         Solver s = model.getSolver();
         s.setSearch(activityBasedSearch(varArr));
 
-        for (int i = 0; i < courseAL.size(); i++) {
-            System.out.println(courseAL.get(i).getAl().size() + "  " + courseAL.get(i).getLabel());
-        }
+        // Student number for each exam
+//        for (int i = 0; i < courseAL.size(); i++) {
+//            System.out.println(courseAL.get(i).getAl().size() + "  " + courseAL.get(i).getLabel());
+//        }
 
         //ArrayList<Course> [] dailyExams = new ArrayList<Course>()[lenOfExamPeriod];
 
@@ -258,27 +280,60 @@ public class MainDriver {
                         inner.add(courseAL.get(i));
                     }
                 }
+
+                for (int i = 0; i < inner.size(); i++) {
+                    for (int k = i; k < inner.size(); k++){
+                        if (inner.get(k).getAl().size() > inner.get(i).getAl().size()) {
+                            Collections.swap(inner,i,k);
+                        }
+                    }
+                }
+
+//                for (Course ce : inner)
+//                    System.out.println(ce.getAl().size());
                 dailyExams.add(inner);
             }
+        //Sorting depinding on number of student
 
 
             //
-//            for (int i = 0; i < courseAL.size(); i++) {
-//                dailyExams.get(variables.get(courseAL.get(i).getVariableIndex()+1).getValue()).add(courseAL.get(i));
-//            }
+//         for (int i = 0; i < courseAL.size(); i++) {
+//               dailyExams.get(variables.get(courseAL.get(i).getVariableIndex()+1).getValue()).add(courseAL.get(i));
+//           }
             ///start from here abuzaid
+            ArrayList<Room> AvaliableRoom ;
             for (int i = 0; i < lenOfExamPeriod; i++) {
+                AvaliableRoom  =   new ArrayList<Room> (Rooms);
                 int sumStu=0;
                 for (int j = 0; j < dailyExams.get(i).size(); j++) {
-                    System.out.println(dailyExams.get(i).get(j));
-                    sumStu+=dailyExams.get(i).get(j).getAl().size();
+
+                    ArrayList<Room> BestAvalibleRooms = new ArrayList<Room>() ;
+
+                    BestAvalibleRooms = FindBestRooms(AvaliableRoom , dailyExams.get(i).get(j));
+                    dailyExams.get(i).get(j).setRooms(BestAvalibleRooms);
+//                    System.out.println( "Course " + " " +dailyExams.get(i).get(j) + "  " + dailyExams.get(i).get(j).getAl().size());
+//                    for (Room r : BestAvalibleRooms)
+//                        System.out.println(r.getId() + " " + r.getLabel() + " " + r.getCapacity());
+//                    System.out.println("\n\nEnd \n\n");
+
+
+//                    System.out.println( "Slot" + " " + i + " " +dailyExams.get(i).get(j));
+//                    sumStu+=dailyExams.get(i).get(j).getAl().size();
                 }
-                System.out.println("exams in slot " + (i+1)+" the number of them is "+ dailyExams.get(i).size());
-                System.out.println("num of bitches who take this "+sumStu);
-                System.out.println("\n\n");
+//                System.out.println("exams in slot " + (i+1)+" the number of them is "+ dailyExams.get(i).size());
+//                System.out.println("num of bitches who take this "+sumStu);
+//                System.out.println("\n\n");
 
 
             }
+        System.out.println("Start Rooming:");
+        for (Course le : courseAL)
+        {
+            if (le.getRooms().size() > 5  )
+                System.out.println(le.getId() + " "+ le.getTitle() + " " +  le.getRooms().size());
+        }
+            System.out.println("End Rooming:");
+
             model.getSolver().setRestartOnSolutions();
 
 
@@ -300,6 +355,51 @@ public class MainDriver {
         D                       D
         M A I N        E N D    *
         */
+    }
+
+
+
+
+    public static ArrayList<Room> FindBestRooms(ArrayList<Room> Avaliabe, Course course) {
+        ArrayList<Room> ExamRoom = new ArrayList<Room> () ;
+
+        if (Avaliabe.size() == 0)
+            return ExamRoom;
+        
+        int numberofstudent = course.getAl().size() *2 ;
+
+         while ( numberofstudent > 0 ) {
+            //Single Room Exam
+
+            if (Avaliabe.get(Avaliabe.size() - 1).getCapacity() >= numberofstudent) {
+                for (Room r : Avaliabe) {
+
+                    if (r.getCapacity() >= numberofstudent) {
+                        ExamRoom.add(r);
+                        Avaliabe.remove(ExamRoom);
+                        return ExamRoom;
+                    }
+
+                }
+            }
+            //multiple room
+            else {
+                // After first loop
+                ExamRoom.add(Avaliabe.get(Avaliabe.size() - 1));
+                numberofstudent  -= Avaliabe.get(Avaliabe.size() - 1).getCapacity();
+                Avaliabe.remove(Avaliabe.get(Avaliabe.size() - 1));
+
+
+
+            }
+        }
+
+
+
+
+
+        Avaliabe.remove(ExamRoom);
+        return ExamRoom;
     }
 
     public static double score(double mean, double var, int b2b, int fourInTow) {
