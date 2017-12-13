@@ -29,6 +29,7 @@ public class Course implements Comparable<Course> {
     private boolean taken=false;
     //each course has an arraylist of students of the students that take this course
     private ArrayList <Student>al = new ArrayList<Student>();
+    ArrayList<Room> rooms = new ArrayList<Room>();
 
     
     
