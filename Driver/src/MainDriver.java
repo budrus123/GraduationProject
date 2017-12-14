@@ -111,7 +111,7 @@ public class MainDriver {
             ResultSet getRoom = stmt3.executeQuery("SELECT * FROM room_table");
             while (getRoom.next()) {
                 //String s = rs.getString("id")+" "+rs.getString("COURSE_LABEL");
-                Room r = new Room(Integer.valueOf(getRoom.getString("id")) , Integer.valueOf(getRoom.getString("CAPACITY")) , getRoom.getString("ROOM"));
+                Room r = new Room(Integer.valueOf(getRoom.getString("id")), Integer.valueOf(getRoom.getString("CAPACITY")), getRoom.getString("ROOM"));
                 Rooms.add(r);
 //                System.out.println(r.getId() + " " + r.getLabel() + " " + r.getCapacity());
 //                System.out.println("\n\n");
@@ -262,7 +262,7 @@ public class MainDriver {
             System.out.println("Our final score = " + sumScore);
             ArrayList<ArrayList<Course>> dailyExams = new ArrayList<ArrayList<Course>>();
 
-            for (int j = 1; j < lenOfExamPeriod+1; j++) {
+            for (int j = 1; j < lenOfExamPeriod + 1; j++) {
                 ArrayList<Course> inner = new ArrayList<Course>();
                 for (int i = 0; i < courseAL.size(); i++) {
                     //dailyExams.get(i) = new ArrayList<Course>();
@@ -272,9 +272,9 @@ public class MainDriver {
                 }
 
                 for (int i = 0; i < inner.size(); i++) {
-                    for (int k = i; k < inner.size(); k++){
+                    for (int k = i; k < inner.size(); k++) {
                         if (inner.get(k).getAl().size() > inner.get(i).getAl().size()) {
-                            Collections.swap(inner,i,k);
+                            Collections.swap(inner, i, k);
                         }
                     }
                 }
@@ -285,30 +285,73 @@ public class MainDriver {
             }
 
 
-            ArrayList<Room> AvaliableRoom ;
+            ArrayList<Room> AvaliableRoom;
             boolean enoughRooms = true;
             for (int i = 0; i < lenOfExamPeriod; i++) {
-                AvaliableRoom = new ArrayList<Room> (Rooms);
+                AvaliableRoom = new ArrayList<Room>(Rooms);
                 for (int j = 0; j < dailyExams.get(i).size(); j++) {
-
-                    ArrayList<Room> bestAvalibleRooms = FindBestRooms(AvaliableRoom , dailyExams.get(i).get(j));
-                    if (bestAvalibleRooms == null){
+                    ArrayList<Room> bestAvalibleRooms = FindBestRooms(AvaliableRoom, dailyExams.get(i).get(j));
+                    if (bestAvalibleRooms == null) {
                         enoughRooms = false;
                         break;
                     }
                     dailyExams.get(i).get(j).setRooms(bestAvalibleRooms);
                 }
-                if (!enoughRooms){
+                if (!enoughRooms) {
                     break;
                 }
             }
-            if (!enoughRooms){
+            if (!enoughRooms) {
                 System.out.println("Rooms are not enough , so this solution is not valid ! ");
                 continue;
             }
 
 
-            Helper_Functions.printOneTimeSlotInfo(dailyExams.get(30));   // input is timeslot
+            boolean roomsvalid = true;
+            for (int i = 0; i < courseAL.size(); i++) {
+                roomsvalid = validateRoomsCap(courseAL.get(i));
+                if (!roomsvalid) {
+                    System.out.println("Rooms are not of enough SIZE");
+                    break;
+                }
+            }
+
+            boolean confRooms = false;
+            for (int i = 1; i < lenOfExamPeriod + 1; i++) {
+                ArrayList<Room> slotRooms = new ArrayList<Room>();
+                for (int j = 0; j < courseAL.size(); j++) {
+                    if (variables.get(courseAL.get(j).getVariableIndex()).getValue() == i) {
+                        for (int k = 0; k < courseAL.get(j).getRooms().size(); k++) {
+                            slotRooms.add(courseAL.get(j).getRooms().get(k));
+                        }
+                    }
+                }
+
+                //List<Room> list = slotRooms;
+                Set<Room> set = new HashSet<Room>(slotRooms);
+
+                if (set.size() < slotRooms.size()) {
+                    //if true this means that the hashset has two or more of the same room
+                    //meaning 2 or more courses in the same room
+                    System.out.println("Rooms are conflicting");
+                    confRooms = true;
+                }
+            }
+
+
+            if (!confRooms) {
+                System.out.println("None of the Rooms are conflicting");
+
+            }
+
+            if (!confRooms && roomsvalid)
+                System.out.println("Rooms are VALID and they are");
+
+
+            for (int i = 0; i < lenOfExamPeriod; i++) {
+                System.out.println("\n\nRooms for slot #" + i);
+                Helper_Functions.printOneTimeSlotInfo(dailyExams.get(i));
+            }// input is timeslot
             model.getSolver().setRestartOnSolutions();
 
         }
@@ -332,20 +375,36 @@ public class MainDriver {
     }
 
 
+    public static boolean validateRoomsCap(Course c) {
+
+        int numOfStudents = c.getAl().size() * 2;
+
+        int reservedSeats = 0;
+        for (int i = 0; i < c.getRooms().size(); i++) {
+            reservedSeats += c.getRooms().get(i).getCapacity();
+        }
+
+        if (reservedSeats < numOfStudents) {
+            return false;
+        }
+
+        return true;
+
+    }
 
 
     public static ArrayList<Room> FindBestRooms(ArrayList<Room> Avaliabe, Course course) {
-        ArrayList<Room> ExamRoom = new ArrayList<Room> () ;
+        ArrayList<Room> ExamRoom = new ArrayList<Room>();
 
-        if(Avaliabe.size() == 0){
+        if (Avaliabe.size() == 0) {
             return null;
         }
-        
-        int numberofstudent = course.getAl().size() *2 ;
 
-         while ( numberofstudent > 0 ) {
+        int numberofstudent = course.getAl().size() * 2;
+
+        while (numberofstudent > 0) {
             //Single Room Exam
-            if(Avaliabe.size() == 0){
+            if (Avaliabe.size() == 0) {
                 return null;
             }
 
@@ -364,7 +423,7 @@ public class MainDriver {
             else {
                 // After first loop
                 ExamRoom.add(Avaliabe.get(Avaliabe.size() - 1));
-                numberofstudent  -= Avaliabe.get(Avaliabe.size() - 1).getCapacity();
+                numberofstudent -= Avaliabe.get(Avaliabe.size() - 1).getCapacity();
                 Avaliabe.remove(Avaliabe.get(Avaliabe.size() - 1));
             }
         }
