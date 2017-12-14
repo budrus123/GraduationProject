@@ -99,10 +99,8 @@ public class MainDriver {
             Statement stmt2 = connection.createStatement();
             ResultSet getStudents = stmt2.executeQuery("SELECT * FROM student_table");
             while (getStudents.next()) {
-                //String s = rs.getString("id")+" "+rs.getString("COURSE_LABEL");
                 Student s = new Student(Integer.valueOf(getStudents.getString("id")), getStudents.getString("DEPARTMENT"));
                 students.add(s);
-                // System.out.println(s);
             }
 
 
@@ -272,7 +270,7 @@ public class MainDriver {
                         inner.add(courseAL.get(i));
                     }
                 }
-                // 1.246208141821423E8
+
                 for (int i = 0; i < inner.size(); i++) {
                     for (int k = i; k < inner.size(); k++){
                         if (inner.get(k).getAl().size() > inner.get(i).getAl().size()) {
@@ -285,49 +283,33 @@ public class MainDriver {
 //                    System.out.println(ce.getAl().size());
                 dailyExams.add(inner);
             }
-        //Sorting depinding on number of student
 
 
-            //
-//         for (int i = 0; i < courseAL.size(); i++) {
-//               dailyExams.get(variables.get(courseAL.get(i).getVariableIndex()+1).getValue()).add(courseAL.get(i));
-//           }
-            ///start from here abuzaid
             ArrayList<Room> AvaliableRoom ;
+            boolean enoughRooms = true;
             for (int i = 0; i < lenOfExamPeriod; i++) {
-                AvaliableRoom  =   new ArrayList<Room> (Rooms);
-                int sumStu=0;
+                AvaliableRoom = new ArrayList<Room> (Rooms);
                 for (int j = 0; j < dailyExams.get(i).size(); j++) {
 
-                    ArrayList<Room> BestAvalibleRooms = new ArrayList<Room>() ;
-
-                    BestAvalibleRooms = FindBestRooms(AvaliableRoom , dailyExams.get(i).get(j));
-                    dailyExams.get(i).get(j).setRooms(BestAvalibleRooms);
-//                    System.out.println( "Course " + " " +dailyExams.get(i).get(j) + "  " + dailyExams.get(i).get(j).getAl().size());
-//                    for (Room r : BestAvalibleRooms)
-//                        System.out.println(r.getId() + " " + r.getLabel() + " " + r.getCapacity());
-//                    System.out.println("\n\nEnd \n\n");
-
-
-//                    System.out.println( "Slot" + " " + i + " " +dailyExams.get(i).get(j));
-//                    sumStu+=dailyExams.get(i).get(j).getAl().size();
+                    ArrayList<Room> bestAvalibleRooms = FindBestRooms(AvaliableRoom , dailyExams.get(i).get(j));
+                    if (bestAvalibleRooms == null){
+                        enoughRooms = false;
+                        break;
+                    }
+                    dailyExams.get(i).get(j).setRooms(bestAvalibleRooms);
                 }
-//                System.out.println("exams in slot " + (i+1)+" the number of them is "+ dailyExams.get(i).size());
-//                System.out.println("num of bitches who take this "+sumStu);
-//                System.out.println("\n\n");
-
-
+                if (!enoughRooms){
+                    break;
+                }
             }
-        System.out.println("Start Rooming:");
-        for (Course le : courseAL)
-        {
-            if (le.getRooms().size() > 5  )
-                System.out.println(le.getId() + " "+ le.getTitle() + " " +  le.getRooms().size());
-        }
-            System.out.println("End Rooming:");
+            if (!enoughRooms){
+                System.out.println("Rooms are not enough , so this solution is not valid ! ");
+                continue;
+            }
 
+
+            Helper_Functions.printOneTimeSlotInfo(dailyExams.get(30));   // input is timeslot
             model.getSolver().setRestartOnSolutions();
-
 
         }
 
@@ -355,13 +337,17 @@ public class MainDriver {
     public static ArrayList<Room> FindBestRooms(ArrayList<Room> Avaliabe, Course course) {
         ArrayList<Room> ExamRoom = new ArrayList<Room> () ;
 
-        if (Avaliabe.size() == 0)
-            return ExamRoom;
+        if(Avaliabe.size() == 0){
+            return null;
+        }
         
         int numberofstudent = course.getAl().size() *2 ;
 
          while ( numberofstudent > 0 ) {
             //Single Room Exam
+            if(Avaliabe.size() == 0){
+                return null;
+            }
 
             if (Avaliabe.get(Avaliabe.size() - 1).getCapacity() >= numberofstudent) {
                 for (Room r : Avaliabe) {
@@ -380,15 +366,8 @@ public class MainDriver {
                 ExamRoom.add(Avaliabe.get(Avaliabe.size() - 1));
                 numberofstudent  -= Avaliabe.get(Avaliabe.size() - 1).getCapacity();
                 Avaliabe.remove(Avaliabe.get(Avaliabe.size() - 1));
-
-
-
             }
         }
-
-
-
-
 
         Avaliabe.remove(ExamRoom);
         return ExamRoom;
@@ -404,11 +383,6 @@ public class MainDriver {
         int scoreSum = 0;
         int score = 0;
 
-        //score=0;
-//            if (slots.size() > 0) {
-//                System.out.println("Student has [" + students.get(index).getSlots().size() + "] exams, slots are:");
-//                students.get(index).printSlots();
-//            }
         int fInt = StatCalculationFunctions.FourInTwo(slots);
         score -= fInt * 20;
 
@@ -419,16 +393,6 @@ public class MainDriver {
         int lastDay = (students.get(index).getLastSlot() - 1) / 3;
         int examLen = students.get(index).getExamsLen();
 
-//            for (int j = 0; j < students.get(i).getSlots2D().length; j++) {
-//
-//                if ((students.get(i).getSlots2D()[i][0] == 0) &&
-//                        (students.get(i).getSlots2D()[i][1] == 0) &&
-//                        (students.get(i).getSlots2D()[i][2] == 0)) {
-//                    continue;
-//                }
-//
-//
-//            }
         if (slots.size() > 0) {
 
             Collections.sort(slots);
@@ -442,7 +406,6 @@ public class MainDriver {
             }
         }
         return score;
-        // System.out.println("Score is: "+score);
 
 
     }

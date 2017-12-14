@@ -396,4 +396,20 @@ public class Helper_Functions {
         return (slot - 1) / 3;
     }
 
+    public static void printOneTimeSlotInfo(ArrayList<Course> courses){
+
+        System.out.println("--------------------------------------------------------------");
+
+        for (Course course: courses) {
+            System.out.println("Course Name: " + course.getLabel());
+            System.out.println("Number of students in this course: " + course.getAl().size());
+            System.out.println("Number of rooms used: " + course.getRooms().size());
+            System.out.println("The rooms used are: ");
+            for (Room room:course.getRooms()) {
+                System.out.println(room.getLabel() + " " + room.getCapacity());
+            }
+            System.out.println("--------------------------------------------------------------");
+        }
+    }
+
 }
