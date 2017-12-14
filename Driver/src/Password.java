@@ -1,5 +1,5 @@
 public class Password {
 
-    public static String password = "root";
+    public static String password = "";
 
 }

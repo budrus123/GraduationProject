@@ -61,14 +61,13 @@ public class MainDriver {
     static int fourin2total, b2bTotal, end5start8sum;
 
     public static void main(String[] args) throws SQLException {
-        String url = "jdbc:mysql://localhost:3308/exams";
+        String url = "jdbc:mysql://localhost:3306/exams";
         String username = "root";
-        String password = "";
         System.out.println("Connecting database...");
         int c = 0;
         try {
 
-            connection = DriverManager.getConnection(url, username, password);
+            connection = DriverManager.getConnection(url, username, Password.password);
             System.out.println("Database connected!");
 
             /* this is to fill both
@@ -248,17 +247,13 @@ public class MainDriver {
                 num[i] = 0;
                 score[i] = 0;
             }
-            int num2, num3, num4, num5, num6, num7, num8, num9;
-            double score2 = 0, score3, score4, score5, score6, score7, score8, score9;
-            num2 = num3 = num4 = num5 = num6 = num7 = num8 = num9 = 0;
-            score2 = score3 = score4 = score5 = score6 = score7 = score8 = score9 = 0;
+
 
             for (int i = 0; i < MainDriver.students.size(); i++) {
                 if (MainDriver.students.get(i).getSlots().size() > 1) {
                     num[MainDriver.students.get(i).getSlots().size() - 1]++;
                     score[MainDriver.students.get(i).getSlots().size() - 1] += ScoringSystem.score(MainDriver.students.get(i).getSlots2D());
                 }
-                //SumScore+= getScore(students.get(i).getSlots(),i);
             }
 
             double sumScore = 0;
@@ -266,12 +261,9 @@ public class MainDriver {
                 sumScore += num[i] * score[i];
             }
 
-            System.out.println("our score = " + sumScore);
+            System.out.println("Our final score = " + sumScore);
             ArrayList<ArrayList<Course>> dailyExams = new ArrayList<ArrayList<Course>>();
 
-//            outer.add(inner);
-//            Course cc=courseAL.get(18);
-//            dailyExams.get(0).add(cc);
             for (int j = 1; j < lenOfExamPeriod+1; j++) {
                 ArrayList<Course> inner = new ArrayList<Course>();
                 for (int i = 0; i < courseAL.size(); i++) {
@@ -280,7 +272,7 @@ public class MainDriver {
                         inner.add(courseAL.get(i));
                     }
                 }
-
+                // 1.246208141821423E8
                 for (int i = 0; i < inner.size(); i++) {
                     for (int k = i; k < inner.size(); k++){
                         if (inner.get(k).getAl().size() > inner.get(i).getAl().size()) {

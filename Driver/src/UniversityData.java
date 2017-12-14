@@ -131,7 +131,6 @@ public class UniversityData {
             }
 
         }
-        System.out.println("Score of uni solution is " + SumScoreU);
         System.out.println("average mean of the University solution = " + (avgSum / countHasExams));
         System.out.println("average variance of the University solution = " + (varSum / countHasExams));
         System.out.println("back to back total uni = " + b2bTotal);
@@ -146,10 +145,6 @@ public class UniversityData {
             num[i] = 0;
             score[i] = 0;
         }
-        int num2, num3, num4, num5, num6, num7, num8, num9;
-        double score2 = 0, score3, score4, score5, score6, score7, score8, score9;
-        num2 = num3 = num4 = num5 = num6 = num7 = num8 = num9 = 0;
-        score2 = score3 = score4 = score5 = score6 = score7 = score8 = score9 = 0;
 
         for (int i = 0; i < MainDriver.students.size(); i++) {
             if(MainDriver.students.get(i).getSlotsU().size()>1){
@@ -157,8 +152,6 @@ public class UniversityData {
                 score[MainDriver.students.get(i).getSlotsU().size() - 1] += ScoringSystem.score(MainDriver.students.get(i).getSlots2DU());
 
             }
-
-            //SumScore+= getScore(students.get(i).getSlots(),i);
         }
 
         double sumScore = 0;
@@ -166,7 +159,7 @@ public class UniversityData {
             sumScore += num[i] * score[i];
         }
 
-        System.out.println("uni score = " + sumScore);
+        System.out.println("University final score = " + sumScore);
 
         System.out.println("\n\n");
 
