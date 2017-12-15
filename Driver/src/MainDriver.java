@@ -61,7 +61,7 @@ public class MainDriver {
     static int fourin2total, b2bTotal, end5start8sum;
 
     public static void main(String[] args) throws SQLException {
-        String url = "jdbc:mysql://localhost:3306/exams";
+        String url = "jdbc:mysql://localhost:3308/exams";
         String username = "root";
         System.out.println("Connecting database...");
         int c = 0;
@@ -291,12 +291,28 @@ public class MainDriver {
                 AvaliableRoom = new ArrayList<Room>(Rooms);
                 for (int j = 0; j < dailyExams.get(i).size(); j++) {
                     ArrayList<Room> bestAvalibleRooms = FindBestRooms(AvaliableRoom, dailyExams.get(i).get(j));
+
                     if (bestAvalibleRooms == null) {
                         enoughRooms = false;
                         break;
                     }
                     dailyExams.get(i).get(j).setRooms(bestAvalibleRooms);
                 }
+
+//                for (int j = 0; j < dailyExams.get(i).size(); j++) {
+//                    for (int o = 0; o < dailyExams.get(i).size(); o++){
+//
+//                        for (int dd = 0; dd < dailyExams.get(i).get(o).getRooms().size(); dd++){
+//
+//                            if (dailyExams.get(i).get(o).getRooms().contains(dailyExams.get(i).get(o).getRooms().get(dd))){
+//                                System.out.println(dailyExams.get(i).get(o).getRooms().get(dd).getLabel());
+//                            }
+//                        }
+//                    }
+//
+//                }
+
+
                 if (!enoughRooms) {
                     break;
                 }
@@ -315,6 +331,7 @@ public class MainDriver {
                     break;
                 }
             }
+
 
             boolean confRooms = false;
             for (int i = 1; i < lenOfExamPeriod + 1; i++) {
@@ -413,7 +430,15 @@ public class MainDriver {
 
                     if (r.getCapacity() >= numberofstudent) {
                         ExamRoom.add(r);
-                        Avaliabe.remove(ExamRoom);
+//                        Avaliabe.remove(ExamRoom);
+
+                        for (int dd = 0; dd < ExamRoom.size(); dd++){
+                            if (Avaliabe.contains(ExamRoom.get(dd)))
+                                Avaliabe.remove(ExamRoom.get(dd));
+
+
+
+                        }
                         return ExamRoom;
                     }
 
@@ -428,7 +453,15 @@ public class MainDriver {
             }
         }
 
-        Avaliabe.remove(ExamRoom);
+//        Avaliabe.remove(ExamRoom);
+
+        for (int dd = 0; dd < ExamRoom.size(); dd++){
+            if (Avaliabe.contains(ExamRoom.get(dd)))
+                Avaliabe.remove(ExamRoom.get(dd));
+
+
+
+        }
         return ExamRoom;
     }
 
