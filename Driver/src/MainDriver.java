@@ -61,7 +61,7 @@ public class MainDriver {
     static int fourin2total, b2bTotal, end5start8sum;
 
     public static void main(String[] args) throws SQLException {
-        String url = "jdbc:mysql://localhost:3308/exams";
+        String url = "jdbc:mysql://localhost:3306/exams";
         String username = "root";
         System.out.println("Connecting database...");
         int c = 0;
@@ -365,10 +365,10 @@ public class MainDriver {
                 System.out.println("Rooms are VALID and they are");
 
 
-            for (int i = 0; i < lenOfExamPeriod; i++) {
-                System.out.println("\n\nRooms for slot #" + i);
-                Helper_Functions.printOneTimeSlotInfo(dailyExams.get(i));
-            }// input is timeslot
+//            for (int i = 0; i < lenOfExamPeriod; i++) {
+//                System.out.println("\n\nRooms for slot #" + i);
+//                Helper_Functions.printOneTimeSlotInfo(dailyExams.get(i));
+//            }// input is timeslot
             model.getSolver().setRestartOnSolutions();
 
         }
@@ -430,15 +430,8 @@ public class MainDriver {
 
                     if (r.getCapacity() >= numberofstudent) {
                         ExamRoom.add(r);
-//                        Avaliabe.remove(ExamRoom);
+                        Avaliabe.remove(r);
 
-                        for (int dd = 0; dd < ExamRoom.size(); dd++){
-                            if (Avaliabe.contains(ExamRoom.get(dd)))
-                                Avaliabe.remove(ExamRoom.get(dd));
-
-
-
-                        }
                         return ExamRoom;
                     }
 
@@ -453,15 +446,7 @@ public class MainDriver {
             }
         }
 
-//        Avaliabe.remove(ExamRoom);
 
-        for (int dd = 0; dd < ExamRoom.size(); dd++){
-            if (Avaliabe.contains(ExamRoom.get(dd)))
-                Avaliabe.remove(ExamRoom.get(dd));
-
-
-
-        }
         return ExamRoom;
     }
 
