@@ -152,7 +152,7 @@ public class MainDriver {
             }
         }
 
-//        System.out.println("done with the combos " + constCounter);
+        System.out.println("done with the combos " + constCounter);
 
         /*
         to fill the interect factor
