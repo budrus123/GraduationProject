@@ -135,8 +135,8 @@ public class UniversityData {
         System.out.println("average variance of the University solution = " + (varSum / countHasExams));
         System.out.println("back to back total uni = " + b2bTotal);
         System.out.println("4 in 2 count  = " + fourIn2total);
-        System.out.println("score of uni solution" + MainDriver.score((avgSum / countHasExams),
-                (varSum / countHasExams), b2bTotal, fourIn2total));
+//        System.out.println("score of uni solution" + MainDriver.score((avgSum / countHasExams),
+//                (varSum / countHasExams), b2bTotal, fourIn2total));
 
         int[] num = new int[9];
         double[] score = new double[9];
@@ -188,10 +188,10 @@ public class UniversityData {
             //count the number of students who have 4 in 2
 
             if (!Helper_Functions.checkIfTwoSlotsSame(students.get(i).getSlotsU()) || !Helper_Functions.checkIfThreeSameDay(students.get(i).getSlotsU())) {
-                System.out.println(students.get(i).getSlotsU() + "  " + students.get(i).getId());
+//                System.out.println(students.get(i).getSlotsU() + "  " + students.get(i).getId());
                 flag = 1;
                 counterOfInvalid++;
-//                System.out.println(studentExams+"\n"+students.get(i).getId());
+//               System.out.println("bb");
             }
         }
         if (flag == 0)

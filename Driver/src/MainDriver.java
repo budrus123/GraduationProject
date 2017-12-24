@@ -51,7 +51,6 @@ public class MainDriver {
     static ArrayList<Room> Rooms = new ArrayList<Room>();
 
     static int constCounter = 0;
-    //our connection
     static Connection connection;
     static double maxMean = 0;
     static double variance = 0;
@@ -60,6 +59,7 @@ public class MainDriver {
 
     static int fourin2total, b2bTotal, end5start8sum;
     static boolean VARBOUS = false;
+
     public static void main(String[] args) throws SQLException {
         String url = "jdbc:mysql://localhost:3306/exams";
         String username = "root";
@@ -110,12 +110,9 @@ public class MainDriver {
             Statement stmt3 = connection.createStatement();
             ResultSet getRoom = stmt3.executeQuery("SELECT * FROM room_table");
             while (getRoom.next()) {
-                //String s = rs.getString("id")+" "+rs.getString("COURSE_LABEL");
                 Room r = new Room(Integer.valueOf(getRoom.getString("id")), Integer.valueOf(getRoom.getString("CAPACITY")), getRoom.getString("ROOM"));
                 Rooms.add(r);
-//                System.out.println(r.getId() + " " + r.getLabel() + " " + r.getCapacity());
-//                System.out.println("\n\n");
-                // System.out.println(s);
+
             }
 
         } catch (SQLException ex) {
@@ -123,7 +120,7 @@ public class MainDriver {
         }
 
 
-// Sort Room depinding on Capacity
+        // Sort Room depinding on Capacity
         Collections.sort(Rooms);
 
         /*
@@ -153,13 +150,9 @@ public class MainDriver {
                 //ConstraintFillingFunctions.studentHassThreeOrMoreNumber2(students.get(p).getCourses());
 
             }
-//            if(students.get(p).getCourses().size()>=4){
-//                ConstraintFillingFunctions.studentHasFourOrMore(students.get(p).getCourses());
-//                //System.out.println(students.get(p).getId());
-//            }
         }
 
-        System.out.println("done with the combos " + constCounter);
+//        System.out.println("done with the combos " + constCounter);
 
         /*
         to fill the interect factor
@@ -168,10 +161,6 @@ public class MainDriver {
 
         Collections.sort(courseAL);
 
-        //System.out.println(courseAL.size());
-//        for (int i = 0; i < courseAL.size(); i++) {
-////            System.out.println(courseAL.get(i).getIntersectFactor() + " " + courseAL.get(i).getLabel() + " var index is:" + courseAL.get(i).getVariableIndex());
-//        }
 
 
         /*
@@ -181,21 +170,14 @@ public class MainDriver {
         */
         int countOfSolution = 0;
 
-        int solution_id = 1;
+
 
         /*inserting the solution
         into the database
          */
-        /*
-        Statement stmt = connection.createStatement();
-        String query = "DELETE FROM solution";
-        stmt.executeUpdate(query);  // delete all records in solution.
-        String insertQuery = Helper_Functions.getSolutionQuery(solution_id++, variables, courseAL, "solution");
-        Statement stmt2 = connection.createStatement();
-        stmt2.executeUpdate(insertQuery);
-        /*
-        done inserting the solution
-         */
+
+
+
 
         new UniversityData(students);
         IntVar[] varArr = variables.toArray(new IntVar[variables.size()]);
@@ -213,31 +195,15 @@ public class MainDriver {
         Solver s = model.getSolver();
         s.setSearch(activityBasedSearch(varArr));
 
-        // Student number for each exam
-//        for (int i = 0; i < courseAL.size(); i++) {
-//            System.out.println(courseAL.get(i).getAl().size() + "  " + courseAL.get(i).getLabel());
-//        }
 
-        //ArrayList<Course> [] dailyExams = new ArrayList<Course>()[lenOfExamPeriod];
-
-
+        double maxScore = 0;
         while (s.solve()) {
-//            ArrayList<ArrayList<Course>> dailyExams = new ArrayList<ArrayList<Course>>(lenOfExamPeriod);
+            //ArrayList<ArrayList<Course>> dailyExams = new ArrayList<ArrayList<Course>>(lenOfExamPeriod);
             Helper_Functions.fillStudentSlots();
             Validation.validateSolution();
             double current = StatCalculationFunctions.calculateStats();
-            double currScore = MainDriver.score(current, variance, b2bTotal, fourInTwoCounter);
-            if (currScore > ourScore) {
-                maxMean = current;
-                ourScore = currScore;
-                System.out.println("score is: " + ourScore);
-                System.out.println("average mean of the solution = " + maxMean);
-                System.out.println("average variance of the solution = " + variance);
-                System.out.println("back to back count is: " + b2bTotal);
-                System.out.println("4 in 2 count is: " + fourin2total);
-                System.out.println("ends 5 starts 8 total is: " + end5start8sum);
+            //double currScore = MainDriver.score(current, variance, b2bTotal, fourInTwoCounter);
 
-            }
             int[] num = new int[9];
             double[] score = new double[9];
 
@@ -259,12 +225,37 @@ public class MainDriver {
                 sumScore += num[i] * score[i];
             }
 
-            System.out.println("Our final score = " + sumScore);
+            System.out.println("Our score = " + sumScore);
 
-            RoomingSystem roomingSystem = new RoomingSystem(lenOfExamPeriod,courseAL,variables,Rooms);
+            if (sumScore > maxScore) {
+                maxScore = sumScore;
+//                maxMean = current;
+//                ourScore = currScore;
+                System.out.println("score is: " + sumScore);
+                System.out.println("average mean of the solution = " + current);
+                System.out.println("average variance of the solution = " + variance);
+                System.out.println("back to back count is: " + b2bTotal);
+                System.out.println("4 in 2 count is: " + fourin2total);
+                System.out.println("ends 5 starts 8 total is: " + end5start8sum);
+                Database.insertSol(connection,variables,courseAL);
+
+                for (int i = 0; i <courseAL.size(); i++) {
+                    System.out.println(courseAL.get(i).getLabel()+" "+variables.get(courseAL.get(i).getVariableIndex()).getValue());
+                }
+
+
+                //done inserting the solution
+
+            }
+
+            ArrayList<ArrayList<Course>> dailyExams = new ArrayList<ArrayList<Course>>();
+
+            RoomingSystem roomingSystem = new RoomingSystem(lenOfExamPeriod, courseAL, variables, Rooms);
             boolean validRooms = roomingSystem.roomingSystem();
+
             if (!validRooms)
                 continue;
+
 
             if (roomingSystem.validateRoomingSystem())
                 System.out.println("Rooms are VALID and they are");
@@ -272,7 +263,11 @@ public class MainDriver {
             if (VARBOUS)
                 roomingSystem.printAllRooms();
 
-            model.getSolver().setRestartOnSolutions();
+//            for (int i = 0; i < lenOfExamPeriod; i++) {
+//                System.out.println("\n\nRooms for slot #" + i);
+//                Helper_Functions.printOneTimeSlotInfo(dailyExams.get(i));
+//            }// input is timeslot
+
 
         }
 
@@ -293,9 +288,6 @@ public class MainDriver {
         M A I N        E N D    *
         */
     }
-
-
-
 
 
     public static double score(double mean, double var, int b2b, int fourInTow) {

@@ -190,17 +190,28 @@ public class Helper_Functions {
 
 
     public static String getSolutionQuery(int solution_id, ArrayList<IntVar> variables, ArrayList<Course> courses, String tableName) {
-        String query = "INSERT INTO " + tableName + "(id,solution_id,course_id,course_label,time_slot) VALUES ";
+        String query = "INSERT INTO " + tableName + "(id,solution_id,course_id,course_label,time_slot,roomslots) VALUES ";
+
         int index = 0;
         String values = "";
-        for (IntVar variable : variables) {
-            int course_id = courses.get(index).getId();
-            String course_label = courses.get(index++).getLabel();
-            int time_slot = variable.getValue();
+        for (Course course : courses) {
+            index++;
+            int course_id = course.getId();
+            String course_label = course.getLabel();
+            int time_slot = variables.get(course.getVariableIndex()).getValue();
+            String rooms="";
+            for (int i = 0; i <course.getRooms().size() ; i++) {
+                if(i!=course.getRooms().size()-1)
+                    rooms=rooms+course.getRooms().get(i).getLabel()+"+";
+                else
+                    rooms=rooms+course.getRooms().get(i).getLabel();
+                System.out.println("fuck s7s");
+
+            }
             if (index != courses.size())
-                values = values + "(" + index + "," + solution_id + "," + course_id + "," + formatName(course_label) + "," + time_slot + "),\n";
+                values = values + "(" + index + "," + solution_id + "," + course_id + "," + formatName(course_label) + "," + time_slot + "," + formatName(rooms) + "),\n";
             else
-                values = values + "(" + index + "," + solution_id + "," + course_id + "," + formatName(course_label) + "," + time_slot + ");\n";
+                values = values + "(" + index + "," + solution_id + "," + course_id + "," + formatName(course_label) + "," + time_slot + "," + formatName(rooms) + ");\n";
 
         }
         query = query + values;
@@ -283,7 +294,7 @@ public class Helper_Functions {
         for (int i = 0; i < slots.size(); i++) {
             for (int k = i + 1; k < slots.size(); k++) {
                 if (slots.get(k) == slots.get(i)) {
-                    System.out.println(slots);
+                    //System.out.println(slots);
                     return false;
                 }
             }
@@ -392,20 +403,20 @@ public class Helper_Functions {
         return score;
     }
 
-    public static int getDay(int slot){
+    public static int getDay(int slot) {
         return (slot - 1) / 3;
     }
 
-    public static void printOneTimeSlotInfo(ArrayList<Course> courses){
+    public static void printOneTimeSlotInfo(ArrayList<Course> courses) {
 
         System.out.println("--------------------------------------------------------------");
 
-        for (Course course: courses) {
+        for (Course course : courses) {
             System.out.println("Course Name: " + course.getLabel());
             System.out.println("Number of students in this course: " + course.getAl().size());
             System.out.println("Number of rooms used: " + course.getRooms().size());
             System.out.println("The rooms used are: ");
-            for (Room room:course.getRooms()) {
+            for (Room room : course.getRooms()) {
                 System.out.println(room.getLabel() + " " + room.getCapacity());
             }
             System.out.println("--------------------------------------------------------------");
