@@ -48,9 +48,9 @@ public class Validation {
             }
         }
         if (flag == 0)
-            System.out.println("***********solution is valid***********");
+            System.out.println("Solution is Valid");
         else
-            System.out.println("solution is not valid");
+            System.out.println("Solution is Not Valid");
 
     }
 

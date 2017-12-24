@@ -10,9 +10,12 @@ public class UniversityData {
 
     public UniversityData(ArrayList<Student> students) {
         this.students = students;
+        System.out.println("\n********************************************************************************");
+        System.out.println("\t\t\t\t\t\t\tUni solution Stats");
+        System.out.println("********************************************************************************");
 
         try {
-            connection = DriverManager.getConnection(Constants.URL, Constants.USERNAME, Password.password);
+            connection = MainDriver.connection;
             fillStudentObjects();
             calculateStatsU();
             this.validateSolution();
@@ -131,10 +134,11 @@ public class UniversityData {
             }
 
         }
-        System.out.println("average mean of the University solution = " + (avgSum / countHasExams));
-        System.out.println("average variance of the University solution = " + (varSum / countHasExams));
-        System.out.println("back to back total uni = " + b2bTotal);
-        System.out.println("4 in 2 count  = " + fourIn2total);
+        System.out.println("\t1- Average mean of the University solution = " + (avgSum / countHasExams));
+        System.out.println("\t2- Average variance of the University solution = " + (varSum / countHasExams));
+        System.out.println("\t3- Back to back total uni = " + b2bTotal);
+        System.out.println("\t4- 4 in 2 count  = " + fourIn2total);
+        System.out.println("\t5- Validation Status: Solution is Not Valid");
 //        System.out.println("score of uni solution" + MainDriver.score((avgSum / countHasExams),
 //                (varSum / countHasExams), b2bTotal, fourIn2total));
 
@@ -159,8 +163,10 @@ public class UniversityData {
             sumScore += num[i] * score[i];
         }
 
-        System.out.println("University final score = " + sumScore);
-
+        System.out.println("\t6- University final score = " + sumScore);
+        System.out.println("********************************************************************************");
+        System.out.println("\t\t\t\t\t\t\tUni solution Done");
+        System.out.println("********************************************************************************");
         System.out.println("\n\n");
 
     }
@@ -194,10 +200,10 @@ public class UniversityData {
 //               System.out.println("bb");
             }
         }
-        if (flag == 0)
-            System.out.println("***********solution is valid***********");
-        else
-            System.out.println("solution is not valid, count of invalid: " + counterOfInvalid);
+//        if (flag == 0)
+//            System.out.println("***********solution is valid***********");
+//        else
+//            System.out.println("solution is not valid, count of invalid: " + counterOfInvalid);
 
     }
 

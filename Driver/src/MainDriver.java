@@ -177,8 +177,6 @@ public class MainDriver {
          */
 
 
-
-
         new UniversityData(students);
         IntVar[] varArr = variables.toArray(new IntVar[variables.size()]);
         Collections.sort(courseAL, new Comparator<Course>() {
@@ -200,73 +198,54 @@ public class MainDriver {
         while (s.solve()) {
             //ArrayList<ArrayList<Course>> dailyExams = new ArrayList<ArrayList<Course>>(lenOfExamPeriod);
             Helper_Functions.fillStudentSlots();
-            Validation.validateSolution();
+
             double current = StatCalculationFunctions.calculateStats();
             //double currScore = MainDriver.score(current, variance, b2bTotal, fourInTwoCounter);
 
-            int[] num = new int[9];
-            double[] score = new double[9];
-
-            for (int i = 0; i < num.length; i++) {
-                num[i] = 0;
-                score[i] = 0;
-            }
-
-
-            for (int i = 0; i < MainDriver.students.size(); i++) {
-                if (MainDriver.students.get(i).getSlots().size() > 1) {
-                    num[MainDriver.students.get(i).getSlots().size() - 1]++;
-                    score[MainDriver.students.get(i).getSlots().size() - 1] += ScoringSystem.score(MainDriver.students.get(i).getSlots2D());
-                }
-            }
-
-            double sumScore = 0;
-            for (int i = 1; i < num.length; i++) {
-                sumScore += num[i] * score[i];
-            }
-
-            System.out.println("Our score = " + sumScore);
+            double sumScore = getSumScore();
+//            System.out.println("Our score = " + sumScore);
 
             if (sumScore > maxScore) {
-                maxScore = sumScore;
-//                maxMean = current;
-//                ourScore = currScore;
-                System.out.println("score is: " + sumScore);
-                System.out.println("average mean of the solution = " + current);
-                System.out.println("average variance of the solution = " + variance);
-                System.out.println("back to back count is: " + b2bTotal);
-                System.out.println("4 in 2 count is: " + fourin2total);
-                System.out.println("ends 5 starts 8 total is: " + end5start8sum);
-                Database.insertSol(connection,variables,courseAL);
+                System.out.println("\n********************************************************************************");
+                System.out.println("\t\t\t\t\t\t\tour solution Stats");
+                System.out.println("********************************************************************************");
+                System.out.println("\t1- Average mean of Our Solution solution = " + current);
+                System.out.println("\t2- Average variance of the University solution = " + variance);
+                System.out.println("\t3- Back to back total uni = " + b2bTotal);
+                System.out.println("\t4- 4 in 2 count  = " + fourin2total);
+                System.out.print("\t5- TimeSlot Validation Status: ");
+                Validation.validateSolution();
 
+                ArrayList<ArrayList<Course>> dailyExams = new ArrayList<ArrayList<Course>>();
+                RoomingSystem roomingSystem = new RoomingSystem(lenOfExamPeriod, courseAL, variables, Rooms);
+                boolean validRooms = roomingSystem.roomingSystem();
+
+
+                if (!validRooms)
+                    continue;
+                if (roomingSystem.validateRoomingSystem())
+                    System.out.println("\t6- RoomSlot Validation Status: VALID");
+                if (VARBOUS)
+                    roomingSystem.printAllRooms();
+                int roomsUsed=0;
                 for (int i = 0; i <courseAL.size(); i++) {
-                    System.out.println(courseAL.get(i).getLabel()+" "+variables.get(courseAL.get(i).getVariableIndex()).getValue());
+                    roomsUsed+=courseAL.get(i).getRooms().size();
                 }
+                System.out.println("\t7- Number of rooms used = " + roomsUsed);
+                System.out.print("\t8- Our Final Score = " + sumScore);
+                System.out.println("\n********************************************************************************");
+                System.out.println("\t\t\t\t\t\t\tour solution Done");
+                System.out.println("********************************************************************************");
+                System.out.print("\n\n");
 
+                maxScore = sumScore;
 
-                //done inserting the solution
+                //insert solution i the database
+                Database.insertSol(connection, variables, courseAL);
 
             }
 
-            ArrayList<ArrayList<Course>> dailyExams = new ArrayList<ArrayList<Course>>();
 
-            RoomingSystem roomingSystem = new RoomingSystem(lenOfExamPeriod, courseAL, variables, Rooms);
-            boolean validRooms = roomingSystem.roomingSystem();
-
-            if (!validRooms)
-                continue;
-
-
-            if (roomingSystem.validateRoomingSystem())
-                System.out.println("Rooms are VALID and they are");
-
-            if (VARBOUS)
-                roomingSystem.printAllRooms();
-
-//            for (int i = 0; i < lenOfExamPeriod; i++) {
-//                System.out.println("\n\nRooms for slot #" + i);
-//                Helper_Functions.printOneTimeSlotInfo(dailyExams.get(i));
-//            }// input is timeslot
 
 
         }
@@ -289,7 +268,32 @@ public class MainDriver {
         */
     }
 
+    public static double getSumScore() {
+        int[] num = new int[9];
+        double[] score = new double[9];
 
+        for (int i = 0; i < num.length; i++) {
+            num[i] = 0;
+            score[i] = 0;
+        }
+
+
+        for (int i = 0; i < MainDriver.students.size(); i++) {
+            if (MainDriver.students.get(i).getSlots().size() > 1) {
+                num[MainDriver.students.get(i).getSlots().size() - 1]++;
+                score[MainDriver.students.get(i).getSlots().size() - 1] += ScoringSystem.score(MainDriver.students.get(i).getSlots2D());
+            }
+        }
+
+        double sumScore = 0;
+        for (int i = 1; i < num.length; i++) {
+            sumScore += num[i] * score[i];
+        }
+
+        return sumScore;
+    }
+
+    /* never used stuff
     public static double score(double mean, double var, int b2b, int fourInTow) {
         double score = (mean / (Math.sqrt(var)) - (1.57 * b2b / 55000) - (36.6 * fourInTow / 55000));
         return score;
@@ -326,6 +330,7 @@ public class MainDriver {
 
 
     }
+     */
 
 
 }

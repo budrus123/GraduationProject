@@ -205,7 +205,7 @@ public class Helper_Functions {
                     rooms=rooms+course.getRooms().get(i).getLabel()+"+";
                 else
                     rooms=rooms+course.getRooms().get(i).getLabel();
-                System.out.println("fuck s7s");
+//                System.out.println("fuck s7s");
 
             }
             if (index != courses.size())

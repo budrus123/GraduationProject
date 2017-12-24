@@ -150,7 +150,7 @@ public class RoomingSystem {
             }
         }
         if (!confRooms) {
-            System.out.println("None of the Rooms are conflicting");
+//            System.out.println("None of the Rooms are conflicting");
         }
 
 
