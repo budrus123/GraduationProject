@@ -59,7 +59,7 @@ public class MainDriver {
     public static int lenOfExamPeriod = 36;
 
     static int fourin2total, b2bTotal, end5start8sum;
-
+    static boolean VARBOUS = false;
     public static void main(String[] args) throws SQLException {
         String url = "jdbc:mysql://localhost:3306/exams";
         String username = "root";
@@ -260,115 +260,18 @@ public class MainDriver {
             }
 
             System.out.println("Our final score = " + sumScore);
-            ArrayList<ArrayList<Course>> dailyExams = new ArrayList<ArrayList<Course>>();
 
-            for (int j = 1; j < lenOfExamPeriod + 1; j++) {
-                ArrayList<Course> inner = new ArrayList<Course>();
-                for (int i = 0; i < courseAL.size(); i++) {
-                    //dailyExams.get(i) = new ArrayList<Course>();
-                    if (variables.get(courseAL.get(i).getVariableIndex()).getValue() == j) {
-                        inner.add(courseAL.get(i));
-                    }
-                }
-
-                for (int i = 0; i < inner.size(); i++) {
-                    for (int k = i; k < inner.size(); k++) {
-                        if (inner.get(k).getAl().size() > inner.get(i).getAl().size()) {
-                            Collections.swap(inner, i, k);
-                        }
-                    }
-                }
-
-//                for (Course ce : inner)
-//                    System.out.println(ce.getAl().size());
-                dailyExams.add(inner);
-            }
-
-
-            ArrayList<Room> AvaliableRoom;
-            boolean enoughRooms = true;
-            for (int i = 0; i < lenOfExamPeriod; i++) {
-                AvaliableRoom = new ArrayList<Room>(Rooms);
-                for (int j = 0; j < dailyExams.get(i).size(); j++) {
-                    ArrayList<Room> bestAvalibleRooms = FindBestRooms(AvaliableRoom, dailyExams.get(i).get(j));
-
-                    if (bestAvalibleRooms == null) {
-                        enoughRooms = false;
-                        break;
-                    }
-                    dailyExams.get(i).get(j).setRooms(bestAvalibleRooms);
-                }
-
-//                for (int j = 0; j < dailyExams.get(i).size(); j++) {
-//                    for (int o = 0; o < dailyExams.get(i).size(); o++){
-//
-//                        for (int dd = 0; dd < dailyExams.get(i).get(o).getRooms().size(); dd++){
-//
-//                            if (dailyExams.get(i).get(o).getRooms().contains(dailyExams.get(i).get(o).getRooms().get(dd))){
-//                                System.out.println(dailyExams.get(i).get(o).getRooms().get(dd).getLabel());
-//                            }
-//                        }
-//                    }
-//
-//                }
-
-
-                if (!enoughRooms) {
-                    break;
-                }
-            }
-            if (!enoughRooms) {
-                System.out.println("Rooms are not enough , so this solution is not valid ! ");
+            RoomingSystem roomingSystem = new RoomingSystem(lenOfExamPeriod,courseAL,variables,Rooms);
+            boolean validRooms = roomingSystem.roomingSystem();
+            if (!validRooms)
                 continue;
-            }
 
-
-            boolean roomsvalid = true;
-            for (int i = 0; i < courseAL.size(); i++) {
-                roomsvalid = validateRoomsCap(courseAL.get(i));
-                if (!roomsvalid) {
-                    System.out.println("Rooms are not of enough SIZE");
-                    break;
-                }
-            }
-
-
-            boolean confRooms = false;
-            for (int i = 1; i < lenOfExamPeriod + 1; i++) {
-                ArrayList<Room> slotRooms = new ArrayList<Room>();
-                for (int j = 0; j < courseAL.size(); j++) {
-                    if (variables.get(courseAL.get(j).getVariableIndex()).getValue() == i) {
-                        for (int k = 0; k < courseAL.get(j).getRooms().size(); k++) {
-                            slotRooms.add(courseAL.get(j).getRooms().get(k));
-                        }
-                    }
-                }
-
-                //List<Room> list = slotRooms;
-                Set<Room> set = new HashSet<Room>(slotRooms);
-
-                if (set.size() < slotRooms.size()) {
-                    //if true this means that the hashset has two or more of the same room
-                    //meaning 2 or more courses in the same room
-                    System.out.println("Rooms are conflicting");
-                    confRooms = true;
-                }
-            }
-
-
-            if (!confRooms) {
-                System.out.println("None of the Rooms are conflicting");
-
-            }
-
-            if (!confRooms && roomsvalid)
+            if (roomingSystem.validateRoomingSystem())
                 System.out.println("Rooms are VALID and they are");
 
+            if (VARBOUS)
+                roomingSystem.printAllRooms();
 
-//            for (int i = 0; i < lenOfExamPeriod; i++) {
-//                System.out.println("\n\nRooms for slot #" + i);
-//                Helper_Functions.printOneTimeSlotInfo(dailyExams.get(i));
-//            }// input is timeslot
             model.getSolver().setRestartOnSolutions();
 
         }
@@ -392,63 +295,8 @@ public class MainDriver {
     }
 
 
-    public static boolean validateRoomsCap(Course c) {
-
-        int numOfStudents = c.getAl().size() * 2;
-
-        int reservedSeats = 0;
-        for (int i = 0; i < c.getRooms().size(); i++) {
-            reservedSeats += c.getRooms().get(i).getCapacity();
-        }
-
-        if (reservedSeats < numOfStudents) {
-            return false;
-        }
-
-        return true;
-
-    }
 
 
-    public static ArrayList<Room> FindBestRooms(ArrayList<Room> Avaliabe, Course course) {
-        ArrayList<Room> ExamRoom = new ArrayList<Room>();
-
-        if (Avaliabe.size() == 0) {
-            return null;
-        }
-
-        int numberofstudent = course.getAl().size() * 2;
-
-        while (numberofstudent > 0) {
-            //Single Room Exam
-            if (Avaliabe.size() == 0) {
-                return null;
-            }
-
-            if (Avaliabe.get(Avaliabe.size() - 1).getCapacity() >= numberofstudent) {
-                for (Room r : Avaliabe) {
-
-                    if (r.getCapacity() >= numberofstudent) {
-                        ExamRoom.add(r);
-                        Avaliabe.remove(r);
-
-                        return ExamRoom;
-                    }
-
-                }
-            }
-            //multiple room
-            else {
-                // After first loop
-                ExamRoom.add(Avaliabe.get(Avaliabe.size() - 1));
-                numberofstudent -= Avaliabe.get(Avaliabe.size() - 1).getCapacity();
-                Avaliabe.remove(Avaliabe.get(Avaliabe.size() - 1));
-            }
-        }
-
-
-        return ExamRoom;
-    }
 
     public static double score(double mean, double var, int b2b, int fourInTow) {
         double score = (mean / (Math.sqrt(var)) - (1.57 * b2b / 55000) - (36.6 * fourInTow / 55000));
