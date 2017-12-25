@@ -89,6 +89,8 @@ public class MainDriver {
                 courseAL.add(co);
 
             }
+//            model.setObjective(Model.MAXIMIZE, variables.get(164));
+
             // end filling up the course arraylist and vars as well
 
 
@@ -130,7 +132,6 @@ public class MainDriver {
         */
         Helper_Functions.fillStudentTakesCourse();
 
-        
         /*
         this is to create the hard constraints
         by checking if 2 courses have the same students
@@ -152,7 +153,7 @@ public class MainDriver {
             }
         }
 
-        System.out.println("done with the combos " + constCounter);
+//        System.out.println("done with the combos " + constCounter);
 
         /*
         to fill the interect factor
@@ -228,11 +229,16 @@ public class MainDriver {
                 if (VARBOUS)
                     roomingSystem.printAllRooms();
                 int roomsUsed=0;
+                int chairsUsed=0;
                 for (int i = 0; i <courseAL.size(); i++) {
                     roomsUsed+=courseAL.get(i).getRooms().size();
+                    for (int j = 0; j < courseAL.get(i).getRooms().size(); j++) {
+                        chairsUsed+=courseAL.get(i).getRooms().get(j).getCapacity();
+                    }
                 }
                 System.out.println("\t7- Number of rooms used = " + roomsUsed);
                 System.out.print("\t8- Our Final Score = " + sumScore);
+                System.out.print("\n\t9- Chairs Used = " + chairsUsed);
                 System.out.println("\n********************************************************************************");
                 System.out.println("\t\t\t\t\t\t\tour solution Done");
                 System.out.println("********************************************************************************");
@@ -287,6 +293,7 @@ public class MainDriver {
 
         double sumScore = 0;
         for (int i = 1; i < num.length; i++) {
+//            System.out.println("the score for "+num[i]+" students is who take "+i+" courses is "+score[i]);
             sumScore += num[i] * score[i];
         }
 
