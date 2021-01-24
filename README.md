@@ -2,7 +2,6 @@
 
 CONTENTS OF THIS FILE
 ---------------------
-
  * Introduction
  * Usage
  * Overview
@@ -39,10 +38,9 @@ schedules that are more efficient for students and gives them the needed time.
 
 INSTALLATION
 ------------
+This program relies on a database of confidential student info from Birzeit University, which cannot be shared. For this reason, the code is available, but a sample database does not exist as of this moment. Please check Driver/src to see the project code.
 
-```sh
-$ python webcrawler.py
-```
-
-
+Overview
+------------
+A complete overview (project report, along with slides) has been added to the **project-overview** directory.
 
