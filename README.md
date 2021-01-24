@@ -23,7 +23,9 @@ to these variables. The goal of the project is to come up with the best method t
 values (timeslots) to the variables in order to come up with the best schedule, without leaving
 an exam empty valued. An example of a CSP problem, the graph coloring problem, can be seen below.
 
-![](graph-coloring.gif)
+<p align="center">
+  <img width="460" height="300" src="https://www.globalsoftwaresupport.com/wp-content/uploads/2018/03/ezgif.com-video-to-gif-34.gif">
+</p>
 
 This work focuses on solving a **real-world examination-timetabling problem at Birzeit
 University (BZU)**. Since Birzeit University has a large number of students (approximately
