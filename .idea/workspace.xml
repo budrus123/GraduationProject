@@ -2,41 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4aeaceb4-6cb7-4a95-a043-9ca7c11995e8" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Driver/src/Driver.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Driver/src/ExaminationTimeTablingAlgorithm.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DriverChoco/.idea/libraries/lib.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DriverChoco/.idea/libraries/tryingChoco1.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DriverChoco/.idea/misc.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DriverChoco/.idea/modules.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DriverChoco/.idea/workspace.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DriverChoco/DriverChoco.iml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DriverChoco/build.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DriverChoco/build/built-jar.properties" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DriverChoco/build/classes/.netbeans_automatic_build" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DriverChoco/build/classes/.netbeans_update_resources" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DriverChoco/build/classes/tryingchoco1/Course.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DriverChoco/build/classes/tryingchoco1/Student.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DriverChoco/build/classes/tryingchoco1/TryingChoco1.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DriverChoco/dist/README.TXT" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DriverChoco/dist/tryingChoco1.jar" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DriverChoco/manifest.mf" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DriverChoco/nbproject/build-impl.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DriverChoco/nbproject/genfiles.properties" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DriverChoco/nbproject/private/private.properties" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DriverChoco/nbproject/private/private.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DriverChoco/nbproject/project.properties" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DriverChoco/nbproject/project.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/sample/src/Course.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/sample/src/Main.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/sample/src/MySimplePropagator.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/sample/src/Student.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/sample/src/ThreeInADay.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/sample/src/twoInADay.java" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/Driver/src/TryingChoco1.java" afterPath="$PROJECT_DIR$/Driver/src/Main.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Driver/src/Constants.java" afterPath="$PROJECT_DIR$/Driver/src/Constants.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Driver/src/FourExamsInTwoADays.java" afterPath="$PROJECT_DIR$/Driver/src/FourExamsInTwoADays.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Driver/src/ThreeInADay.java" afterPath="$PROJECT_DIR$/Driver/src/ThreeInADay.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Driver/src/Validation.java" afterPath="$PROJECT_DIR$/Driver/src/Validation.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -134,7 +101,7 @@
         <entry file="file://$PROJECT_DIR$/Driver/src/Validation.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="126">
-              <caret line="6" column="0" lean-forward="true" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+              <caret line="6" column="0" lean-forward="false" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -363,12 +330,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1611449121841</updated>
-      <workItem from="1611449125985" duration="409000" />
+      <workItem from="1611449125985" duration="812000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="409000" />
+    <option name="totallyTimeSpent" value="812000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-6" y="-6" width="1613" height="913" extended-state="6" />
@@ -544,7 +511,7 @@
     <entry file="file://$PROJECT_DIR$/Driver/src/Validation.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="126">
-          <caret line="6" column="0" lean-forward="true" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+          <caret line="6" column="0" lean-forward="false" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
           <folding />
         </state>
       </provider>
