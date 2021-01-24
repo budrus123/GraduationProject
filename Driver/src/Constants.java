@@ -11,15 +11,6 @@ public class Constants {
 
     // Global Variables
 
-
-
-
     // Configuration Variables
-
-
-
-
-
-
 
 }

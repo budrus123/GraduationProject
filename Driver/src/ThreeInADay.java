@@ -12,14 +12,9 @@ public class ThreeInADay extends Propagator<IntVar> {
 
     public ThreeInADay(IntVar[] varsz) {
         super(varsz, PropagatorPriority.CUBIC, true);
-        //System.out.println(vars[0]);
-        //this.vars = varsz;
         this.x = vars[0];
         this.y = vars[1];
         this.z = vars[2];
-//        System.out.println(x);
-//        System.out.println(y);
-//        System.out.println(z);
     }
 
     @Override
@@ -29,9 +24,6 @@ public class ThreeInADay extends Propagator<IntVar> {
 
     @Override
     public void propagate(int idxVarInProp, int evtmask) throws ContradictionException {
-//        System.out.println(vars[idxVarInProp] + " smth changed");
-//        System.out.println(Main.model4.getVar(idxVarInProp) + " changed");
-//        System.out.println(Main.model4);
 
         if (vars[idxVarInProp] == x) {
             int[] interval = Helper_Functions.getInterval(x.getValue());

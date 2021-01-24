@@ -13,6 +13,4 @@ public class Validation {
         }
         return numberOfSlots == numberOfUniversitySlots;
     }
-
-
 }
