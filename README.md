@@ -21,7 +21,9 @@ The method that was used to solve this problem was the **Constraint Satisfaction
 depends on considering each exam as a variable and the timeslots as values that can be assigned
 to these variables. The goal of the project is to come up with the best method to assign these
 values (timeslots) to the variables in order to come up with the best schedule, without leaving
-an exam empty valued. 
+an exam empty valued. An example of a CSP problem, the graph coloring problem, can be seen below.
+
+![](graph-coloring.gif)
 
 This work focuses on solving a **real-world examination-timetabling problem at Birzeit
 University (BZU)**. Since Birzeit University has a large number of students (approximately
